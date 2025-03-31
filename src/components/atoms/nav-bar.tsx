@@ -23,7 +23,7 @@ export const Navbar = () => {
             </SheetTrigger>
             <SheetContent
               side="left"
-              className="w-[280px] border-0 border-amber-500/30 bg-black/95 backdrop-blur-md"
+              className="w-[280px] border-0 border-amber-500/30 bg-black/95 backdrop-blur-md [&>button]:hidden"
             >
               <div className="flex flex-col h-full">
                 <div className="flex items-center justify-between mb-6 pt-4">
