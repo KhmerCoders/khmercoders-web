@@ -1,9 +1,9 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ChevronLeft, ExternalLink } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 
 import { Button } from "@/components/generated/button";
-import { IPartner, partners as PartnerDatabase } from "@/data/partners";
+import { type IPartner, partners as PartnerDatabase } from "@/data/partners";
 import { useMemo } from "react";
 import { cn } from "@/utils";
 
@@ -32,24 +32,35 @@ export default async function PartnersPage() {
 
   return (
     <main className="container mx-auto px-4 pb-20">
-      <section className="mb-20">
+      <section className="mb-20" aria-labelledby="partners-heading">
         <div className="flex items-center justify-center mb-12">
-          <div className="h-px bg-gray-800 flex-grow"></div>
-          <h2 className="text-2xl md:text-3xl font-bold px-6">Partners</h2>
-          <div className="h-px bg-gray-800 flex-grow"></div>
+          <div className="h-px bg-gray-800 flex-grow" />
+          <h2
+            id="partners-heading"
+            className="text-2xl md:text-3xl font-bold px-6"
+          >
+            Partners
+          </h2>
+          <div className="h-px bg-gray-800 flex-grow" />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {partners.map((partner, index) => (
-            <PartnerCard key={index} partner={partner} tier="gold" />
+          {partners.map((partner) => (
+            <PartnerCard key={partner.website} partner={partner} />
           ))}
         </div>
       </section>
 
-      <section className="mt-24 bg-gray-900 rounded-lg p-8 md:p-12">
+      <section
+        className="mt-24 bg-gray-900 rounded-lg p-8 md:p-12"
+        aria-labelledby="become-a-partner-heading"
+      >
         <div className="flex flex-col md:flex-row items-center gap-8">
           <div className="flex-1">
-            <h2 className="text-2xl md:text-3xl font-bold mb-4">
+            <h2
+              id="become-a-partner-heading"
+              className="text-2xl md:text-3xl font-bold mb-4"
+            >
               Become a Partner
             </h2>
             <p className="text-gray-400 mb-6">
@@ -62,14 +73,14 @@ export default async function PartnersPage() {
             </Button>
           </div>
           <div className="flex-1 flex justify-center">
-            <div className="relative h-64 w-full max-w-md rounded-lg overflow-hidden">
+            <figure className="relative h-64 w-full max-w-md rounded-lg overflow-hidden">
               <Image
                 src="/placeholder.svg?height=400&width=600"
                 alt="Become a partner"
                 fill
                 className="object-cover"
               />
-            </div>
+            </figure>
           </div>
         </div>
       </section>
@@ -78,112 +89,70 @@ export default async function PartnersPage() {
 }
 
 // Partner Card Component
-function PartnerCard({
-  partner,
-  tier,
-}: {
-  partner: IPartner;
-  tier: "platinum" | "gold" | "silver";
-}) {
-  // Different styling based on partner tier
-  const cardClasses = {
-    platinum:
-      "bg-gray-900 rounded-lg overflow-hidden border border-yellow-500/30 flex flex-col h-full",
-    gold: "bg-gray-900 rounded-lg overflow-hidden border border-gray-800 flex flex-col h-full",
-    silver:
-      "bg-gray-900 rounded-lg overflow-hidden border border-gray-800 flex flex-col h-full p-4",
-  };
+function PartnerCard({ partner }: { partner: IPartner }) {
+  const cardClasses =
+    "bg-gray-900 rounded-lg overflow-hidden border border-gray-800 flex flex-col h-full";
 
-  const logoSizes = {
-    platinum: "h-24",
-    gold: "h-20",
-    silver: "h-16",
-  };
+  const TAG_STYLES = {
+    Venue: "bg-green-700",
+    "Gold Sponsor": "bg-yellow-700",
+    "Co-organizer": "bg-blue-700",
+    "Silver Sponsor": "bg-gray-600",
+    default: "bg-gray-600",
+  } as const;
 
-  const tagElements = useMemo(() => {
-    return (
+  const tagElements = useMemo(
+    () => (
       <div className="text-sm flex gap-2 mb-4">
-        {partner.tags.map((tag) => {
-          let tagClass = "bg-gray-600";
-
-          if (tag.type === "Venue") {
-            tagClass = "bg-green-700";
-          } else if (tag.type === "Gold Sponsor") {
-            tagClass = "bg-yellow-700";
-          } else if (tag.type === "Co-organizer") {
-            tagClass = "bg-blue-700";
-          }
-
-          return (
-            <div
-              className={cn(tagClass, "px-2 py-1 rounded flex gap-2")}
-              key={tag.type}
-            >
-              <span>
-                {tag.type} {tag.badge ? ` • ${tag.badge}` : ""}
-              </span>
-            </div>
-          );
-        })}
+        {partner.tags.map((tag) => (
+          <div
+            className={cn(
+              TAG_STYLES[tag.type as keyof typeof TAG_STYLES] ||
+                TAG_STYLES.default,
+              "px-2 py-1 rounded flex gap-2"
+            )}
+            key={tag.type}
+          >
+            <span>
+              {tag.type}
+              {tag.badge && ` • ${tag.badge}`}
+            </span>
+          </div>
+        ))}
       </div>
-    );
-  }, [partner.tags]);
+    ),
+    [partner.tags, TAG_STYLES]
+  );
 
   return (
-    <div className={cardClasses[tier]}>
-      {tier !== "silver" && (
-        <div className="relative h-48 w-full bg-gray-800 flex items-center justify-center p-6">
+    <article className={cardClasses}>
+      <div className="relative aspect-[2/1] w-full bg-gray-800 flex items-center justify-center p-6">
+        <figure className="relative w-full h-full max-w-[240px] max-h-[120px]">
           <Image
             src={partner.logo || "/placeholder.svg"}
             alt={partner.name}
-            width={300}
-            height={150}
-            className={`object-contain ${logoSizes[tier]}`}
+            fill
+            className="object-contain"
           />
-        </div>
-      )}
+        </figure>
+      </div>
 
-      <div
-        className={
-          tier === "silver" ? "flex flex-col items-center" : "p-6 flex-grow"
-        }
-      >
-        {tier === "silver" && (
-          <div className="flex items-center justify-center w-full mb-4">
-            <Image
-              src={partner.logo || "/placeholder.svg"}
-              alt={partner.name}
-              width={150}
-              height={75}
-              className={`object-contain ${logoSizes[tier]}`}
-            />
-          </div>
-        )}
-
+      <section className="p-6 flex-grow" aria-labelledby="partner-name">
         {tagElements}
-
-        <h3
-          className={`font-bold ${
-            tier === "silver" ? "text-center" : "text-xl mb-2"
-          }`}
-        >
+        <h3 id="partner-name" className="text-xl font-bold mb-2">
           {partner.name}
         </h3>
-
-        {tier !== "silver" && (
-          <>
-            <p className="text-gray-400 mb-4">{partner.description}</p>
-            <Link
-              href={partner.website}
-              className="inline-flex items-center text-yellow-500 hover:text-yellow-400"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Visit Website <ExternalLink className="ml-1 h-3 w-3" />
-            </Link>
-          </>
-        )}
-      </div>
-    </div>
+        <p className="text-gray-400 mb-4">{partner.description}</p>
+        <Link
+          href={partner.website}
+          className="inline-flex items-center text-yellow-500 hover:text-yellow-400"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Visit Website <ExternalLink className="ml-1 h-3 w-3" />
+        </Link>
+      </section>
+    </article>
   );
 }
+
