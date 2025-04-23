@@ -9,15 +9,27 @@ import {
   SheetClose,
 } from "@/components/generated/sheet";
 import Image from "next/image";
+import { UserAvatar } from "./user-avatar";
+import Link from "next/link";
+import { auth } from "@/utils/auth";
+import { headers } from "next/headers";
 
-export const Navbar = () => {
+export const Navbar = async () => {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
   return (
     <div className="flex items-center flex-row">
-      <div className="sm:hidden">
-        <NavbarContainer className="items-center flex-row">
+      <div className="flex gap-4 items-center sm:hidden">
+        <UserAvatar user={session?.user} />
+        <NavbarContainer
+          className="items-center flex-row"
+          aria-label="Mobile Navigation"
+        >
           <Sheet>
             <SheetTrigger asChild>
-              <button className="p-2">
+              <button type="button" className="p-2">
                 <Menu className="h-6 w-6 text-amber-500" />
               </button>
             </SheetTrigger>
@@ -27,14 +39,14 @@ export const Navbar = () => {
             >
               <div className="flex flex-col h-full">
                 <div className="flex items-center justify-between mb-6 pt-4">
-                  <SheetTitle className="text-amber-500 text-xl font-semibold pl-4">
-                    <Image
-                      src="/khmer-coder.svg"
-                      alt="Khmer Coders"
-                      width={100}
-                      height={100}
-                    />
-                  </SheetTitle>
+                  <Image
+                    src="/khmer-coder.svg"
+                    alt="Khmer Coders"
+                    width={100}
+                    height={100}
+                  />
+                  <SheetTitle className="sr-only">Khmer Coders</SheetTitle>
+
                   <SheetClose className="rounded-full h-8 w-8 p-0 flex items-center justify-center hover:bg-amber-500/10 transition-colors">
                     <X className="size-6 text-amber-500" />
                     <span className="sr-only">Close</span>
@@ -72,13 +84,14 @@ export const Navbar = () => {
           </Sheet>
         </NavbarContainer>
       </div>
-      <div className="hidden sm:flex">
-        <NavbarContainer>
+      <div className="hidden sm:flex gap-4 items-center">
+        <NavbarContainer aria-label="Main Navigation">
           <NavbarLink href="/events">Events</NavbarLink>
           <NavbarLink href="/teams">Teams</NavbarLink>
           <NavbarLink href="/partners">Partners</NavbarLink>
           <NavbarLink href="/donate">Donate</NavbarLink>
         </NavbarContainer>
+        <UserAvatar user={session?.user} />
       </div>
     </div>
   );
@@ -112,9 +125,10 @@ export const NavbarLink = ({
   ...props
 }: {
   isHighlighted?: boolean;
-} & ComponentProps<"a">) => {
+  href: string;
+} & Omit<ComponentProps<typeof Link>, "href">) => {
   return (
-    <a
+    <Link
       href={href}
       className={cn(
         "relative inline-flex text-sm h-11 tracking-tight items-center",
@@ -127,6 +141,7 @@ export const NavbarLink = ({
       {...props}
     >
       {children}
-    </a>
+    </Link>
   );
 };
+

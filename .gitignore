@@ -19,9 +19,17 @@ yarn-error.log*
 # env files
 .env*
 
+
 # vercel
 .vercel
 
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# wrangler
+.wrangler/
+.dev.vars
+
+#opennext
+.open-next/

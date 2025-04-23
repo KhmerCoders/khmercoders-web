@@ -326,3 +326,4 @@ export default async function LandingPage() {
     </main>
   );
 }
+

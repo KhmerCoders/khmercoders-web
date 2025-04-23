@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1745234443543,
+      "tag": "20250421112043_dear_mulholland_black",
+      "breakpoints": true
+    }
+  ]
+}

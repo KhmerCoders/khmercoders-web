@@ -28,3 +28,26 @@ export interface ICommunityMember {
   linkedin?: string;
   website?: string;
 }
+
+export interface Session {
+  session: {
+    expiresAt: Date;
+    token: string;
+    createdAt: Date;
+    updatedAt: Date;
+    ipAddress?: string | null;
+    userAgent?: string | null;
+    userId: string;
+    id: string;
+  };
+  user: {
+    name: string | null;
+    email: string | null;
+    emailVerified: Date | null;
+    image: string | null;
+    createdAt: Date;
+    updatedAt: Date;
+    id: string;
+  };
+}
+
