@@ -2,7 +2,7 @@
 import { GithubIcon } from "@/components/atoms/icons";
 import { getDB } from "@/libs/db";
 import * as schema from "@/libs/db/schema";
-import { desc, eq } from "drizzle-orm";
+import { desc, eq, sql } from "drizzle-orm";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
@@ -93,7 +93,11 @@ export default async function UserProfilePage({
     .select()
     .from(schema.workExperience)
     .where(eq(schema.workExperience.userId, profile.user.id))
-    .orderBy(desc(schema.workExperience.endYear), desc(schema.workExperience.startYear));
+    .orderBy(
+      desc(
+        sql`CASE WHEN ${schema.workExperience.endYear} IS NULL THEN 1 ELSE 0 END`
+      )
+    );
 
   return (
     <>
