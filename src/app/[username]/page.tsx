@@ -8,6 +8,7 @@ import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import { UserLevelBadge } from "@/components/user-level-badge";
 import { ProfileTrackingComponent } from "./tracker";
+import { sql } from 'drizzle-orm';
 
 export async function generateMetadata({
   params,
@@ -93,7 +94,7 @@ export default async function UserProfilePage({
     .select()
     .from(schema.workExperience)
     .where(eq(schema.workExperience.userId, profile.user.id))
-    .orderBy(desc(schema.workExperience.endYear), desc(schema.workExperience.startYear));
+    .orderBy(desc(sql`COALESCE(${schema.workExperience.endYear}, 9999)`), desc(schema.workExperience.startYear));
 
   return (
     <>
@@ -209,7 +210,7 @@ export default async function UserProfilePage({
                   <h3 className="text-sm font-semibold">{exp.role}</h3>{" "}
                   <p className="text-sm text-gray-400">
                     <span className="text-yellow-400">{exp.companyName}</span> (
-                    {exp.startYear} - {exp.endYear ? exp.endYear : "Present"})
+                      {exp.startYear} - {exp.endYear ?? "Present"})
                   </p>
                   <p className="text-sm text-gray-400 whitespace-pre-line">
                     {exp.description}
