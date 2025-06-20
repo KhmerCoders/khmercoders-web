@@ -93,7 +93,7 @@ export default async function UserProfilePage({
     .select()
     .from(schema.workExperience)
     .where(eq(schema.workExperience.userId, profile.user.id))
-    .orderBy(desc(schema.workExperience.startYear));
+    .orderBy(desc(schema.workExperience.endYear));
 
   return (
     <>
