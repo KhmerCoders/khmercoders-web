@@ -3,12 +3,13 @@ import "@/app/globals.css";
 import { Inter } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import Link from "next/link";
-import { Code, Facebook, Github, Twitter } from "lucide-react";
+import { Facebook, Github } from "lucide-react";
 import Navbar from "@/components/atoms/nav-bar";
 import Image from "next/image";
 import { KCLinks } from "@/data/link";
 import { DiscordIcon } from "@/components/atoms/icons";
 import { SessionProvider } from "./session";
+import { KhmerCoderDevtool } from "@/components/devtool";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -26,10 +27,23 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark" suppressHydrationWarning={true}>
       <head>
-        <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png" />
-        <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png" />
-        <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png" />
-        <link rel="manifest" href="/favicon/site.webmanifest" />
+        <link
+          rel="apple-touch-icon"
+          sizes="180x180"
+          href="/favicon/apple-touch-icon.png"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="32x32"
+          href="/favicon/favicon-32x32.png"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="16x16"
+          href="/favicon/favicon-16x16.png"
+        />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           rel="preconnect"
@@ -73,7 +87,10 @@ export default function RootLayout({
                   <div className="container mx-auto px-4">
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
                       <div>
-                        <Link href="/" className="flex flex-col items-start sm:flex-row sm:items-center gap-2 mb-4">
+                        <Link
+                          href="/"
+                          className="flex flex-col items-start sm:flex-row sm:items-center gap-2 mb-4"
+                        >
                           <Image
                             src="/khmer-coder.svg"
                             alt="Khmer Coders"
@@ -216,6 +233,7 @@ export default function RootLayout({
                 </footer>
               </div>
             </div>
+            {process.env.NODE_ENV === "development" && <KhmerCoderDevtool />}
           </SessionProvider>
         </ThemeProvider>
       </body>

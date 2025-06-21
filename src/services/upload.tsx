@@ -3,6 +3,8 @@ import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { v4 as uuidv4 } from "uuid";
 import * as schema from "@/libs/db/schema";
 import { eq, sql } from "drizzle-orm";
+import { getContentTypeFromExtension } from "@/utils/content-type";
+import { USER_UPLOAD_URL } from "@/constants";
 
 interface UploadFileOptions {
   buffer: ArrayBuffer;
@@ -55,22 +57,7 @@ export async function uploadFile(
   const generatedFilename = `${uuid}.${extension}`;
   const path = [folder ?? "", generatedFilename].filter(Boolean).join("/");
 
-  // This ensures the mapping has all allowed extensions
-  const mappingContentType: Record<string, string> = {
-    jpg: "image/jpeg",
-    jpeg: "image/jpeg",
-    png: "image/png",
-    gif: "image/gif",
-    webp: "image/webp",
-    zip: "application/zip",
-    rar: "application/x-rar-compressed",
-    tar: "application/x-tar",
-    gz: "application/gzip",
-    pdf: "application/pdf",
-  };
-
-  const contentType =
-    mappingContentType[extension.toLowerCase()] || "application/octet-stream";
+  const contentType = getContentTypeFromExtension(extension);
 
   await env.USER_UPLOADS.put(path, buffer, {
     httpMetadata: {
@@ -78,7 +65,7 @@ export async function uploadFile(
     },
   });
 
-  const url = `https://cdn.khmercoder.com/${path}`;
+  const url = `${USER_UPLOAD_URL}/${path}`;
 
   await db.batch([
     db.insert(schema.userUpload).values({

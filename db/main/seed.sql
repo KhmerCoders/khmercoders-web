@@ -5,12 +5,12 @@
 -- User data (only users with GitHub accounts)
 INSERT INTO `user` (`id`, `name`, `email`, `email_verified`, `image`, `created_at`, `updated_at`, `reputation`, `level`)
 VALUES
-  ('usr_01HQTG5BBRX3XY1JJVNN6CZ7ZB', 'Dara Sok', 'dara.sok@example.com', 1, 'https://randomuser.me/api/portraits/men/1.jpg', 1717247622, 1717247622, 25, 1),
+  ('usr_01HQTG5BBRX3XY1JJVNN6CZ7ZB', 'Visal In', 'visal@example.com', 1, 'https://randomuser.me/api/portraits/men/1.jpg', 1717247622, 1717247622, 25, 20),
   ('usr_01HQTG5BBRX3XY1JJVNN6CZ7ZC', 'Srey Pich', 'srey.pich@example.com', 1, 'https://randomuser.me/api/portraits/women/2.jpg', 1717247622, 1717247622, 150, 5),
   ('usr_01HQTG5BBRX3XY1JJVNN6CZ7ZD', 'Sokha Meas', 'sokha.meas@example.com', 1, 'https://randomuser.me/api/portraits/men/3.jpg', 1717247622, 1717247622, 75, 8),
   ('usr_01HQTG5BBRX3XY1JJVNN6CZ7ZE', 'Sophea Heng', 'sophea.heng@example.com', 1, 'https://randomuser.me/api/portraits/women/4.jpg', 1717247622, 1717247622, 50, 0),
   ('usr_01HQTG5BBRX3XY1JJVNN6CZ7ZF', 'Rithy Chhay', 'rithy.chhay@example.com', 1, 'https://randomuser.me/api/portraits/men/5.jpg', 1717247622, 1717247622, 100, 10),
-  ('usr_01HQTG5BBRX3XY1JJVNN6CZ7ZG', 'Admin User', 'admin@khmercoders.org', 1, 'https://randomuser.me/api/portraits/men/9.jpg', 1717247622, 1717247622, 500, 20);
+  ('usr_01HQTG5BBRX3XY1JJVNN6CZ7ZG', 'Dara', 'admin@khmercoders.org', 1, 'https://randomuser.me/api/portraits/men/9.jpg', 1717247622, 1717247622, 500, 1);
 
 -- Account data (GitHub accounts only)
 INSERT INTO `account` (`id`, `account_id`, `provider_id`, `user_id`, `access_token`, `refresh_token`, `id_token`, `access_token_expires_at`, `refresh_token_expires_at`, `scope`, `password`, `created_at`, `updated_at`)
@@ -21,6 +21,14 @@ VALUES
   ('acc_01HQTG5BBRX3XY1JJVNN6CZ7ZK', '45678', 'github', 'usr_01HQTG5BBRX3XY1JJVNN6CZ7ZE', 'gho_fakeaccesstoken456789012', 'ghr_fakerefreshtoken456789012', NULL, 1717334022, 1719839222, 'read:user,user:email', NULL, 1717247622, 1717247622),
   ('acc_01HQTG5BBRX3XY1JJVNN6CZ7ZL', '56789', 'github', 'usr_01HQTG5BBRX3XY1JJVNN6CZ7ZF', 'gho_fakeaccesstoken567890123', 'ghr_fakerefreshtoken567890123', NULL, 1717334022, 1719839222, 'read:user,user:email', NULL, 1717247622, 1717247622),
   ('acc_01HQTG5BBRX3XY1JJVNN6CZ7ZM', '67890', 'github', 'usr_01HQTG5BBRX3XY1JJVNN6CZ7ZG', 'gho_fakeaccesstoken678901234', 'ghr_fakerefreshtoken678901234', NULL, 1717334022, 1719839222, 'read:user,user:email', NULL, 1717247622, 1717247622);
+
+-- Email authentication accounts (password hashes are fake)
+INSERT INTO `account` (`id`, `account_id`, `provider_id`, `user_id`, `access_token`, `refresh_token`, `id_token`, `access_token_expires_at`, `refresh_token_expires_at`, `scope`, `password`, `created_at`, `updated_at`)
+VALUES
+  ('acc_01HQTG5CDEF3XY1JJVNN6CZ7Z1', 'visal@example.com', 'credential', 'usr_01HQTG5BBRX3XY1JJVNN6CZ7ZB', NULL, NULL, NULL, NULL, NULL, NULL, 'c95140c0a8f4fceb2930138ae2f22967:c088d7e4f05d700f1a5bf49aaf13c2012a425ae0eedb9602131bb9d9d1caa4ec74e29a797a50c9af95b482edea4525f2010033ce3008424b23d1a7b7e3213955', 1717247622, 1717247622),
+  ('acc_01HQTG5CDEF3XY1JJVNN6CZ7Z2', 'srey.pich@example.com', 'credential', 'usr_01HQTG5BBRX3XY1JJVNN6CZ7ZC', NULL, NULL, NULL, NULL, NULL, NULL, 'c95140c0a8f4fceb2930138ae2f22967:c088d7e4f05d700f1a5bf49aaf13c2012a425ae0eedb9602131bb9d9d1caa4ec74e29a797a50c9af95b482edea4525f2010033ce3008424b23d1a7b7e3213955', 1717247622, 1717247622),
+  ('acc_01HQTG5CDEF3XY1JJVNN6CZ7Z3', 'sokha.meas@example.com', 'credential', 'usr_01HQTG5BBRX3XY1JJVNN6CZ7ZD', NULL, NULL, NULL, NULL, NULL, NULL, 'c95140c0a8f4fceb2930138ae2f22967:c088d7e4f05d700f1a5bf49aaf13c2012a425ae0eedb9602131bb9d9d1caa4ec74e29a797a50c9af95b482edea4525f2010033ce3008424b23d1a7b7e3213955', 1717247622, 1717247622),
+  ('acc_01HQTG5CDEF3XY1JJVNN6CZ7Z4', 'admin@khmercoders.org', 'credential', 'usr_01HQTG5BBRX3XY1JJVNN6CZ7ZG', NULL, NULL, NULL, NULL, NULL, NULL, 'c95140c0a8f4fceb2930138ae2f22967:c088d7e4f05d700f1a5bf49aaf13c2012a425ae0eedb9602131bb9d9d1caa4ec74e29a797a50c9af95b482edea4525f2010033ce3008424b23d1a7b7e3213955', 1717247622, 1717247622);
 
 -- Active sessions for GitHub users (Tokens would be much longer in production)
 INSERT INTO `session` (`id`, `expires_at`, `token`, `created_at`, `updated_at`, `ip_address`, `user_agent`, `user_id`)

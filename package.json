@@ -10,6 +10,7 @@
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
     "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
+    "test": "vitest",
     "db:generate": "drizzle-kit generate",
     "db:clean": "node ./scripts/clean-database.js",
     "db:seed": "wrangler d1 execute khmercoders --local --file=./db/main/seed.sql",
@@ -85,6 +86,7 @@
     "postcss": "^8",
     "tailwindcss": "^3.4.17",
     "typescript": "^5",
+    "vitest": "^3.2.4",
     "wrangler": "^4.7.2"
   }
 }

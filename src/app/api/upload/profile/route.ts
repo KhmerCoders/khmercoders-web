@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withApiAuth, ApiAuthContext } from "../../middleware";
 import * as schema from "@/libs/db/schema";
-import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
 import { eq } from "drizzle-orm";
 import { uploadFile } from "@/services/upload";
@@ -70,31 +69,54 @@ export const POST = withApiAuth(
         },
       });
 
-      // Use the Cloudflare Images binding to transform the image
-      const transformer = env.IMAGES.input(imageStream);
+      let url = "";
 
-      // Apply resize transformation to 512x512
-      const transformed = transformer.transform({
-        width: 512,
-        height: 512,
-        fit: "cover",
-      });
+      try {
+        // Use the Cloudflare Images binding to transform the image
+        const transformer = env.IMAGES.input(imageStream);
 
-      // Get the output as webp for better compression
-      const result = await transformed.output({
-        format: "image/webp",
-        quality: 90,
-      });
+        // Apply resize transformation to 512x512
+        const transformed = transformer.transform({
+          width: 512,
+          height: 512,
+          fit: "cover",
+        });
 
-      // Get the transformed image as response
-      const resizedImageResponse = result.response();
-      resizedImageData = await resizedImageResponse.arrayBuffer();
+        // Get the output as webp for better compression
+        const result = await transformed.output({
+          format: "image/webp",
+          quality: 90,
+        });
 
-      const { url } = await uploadFile(db, user, {
-        buffer: resizedImageData,
-        filename: "profile.webp",
-        folder: "profiles",
-      });
+        // Get the transformed image as response
+        const resizedImageResponse = result.response();
+        resizedImageData = await resizedImageResponse.arrayBuffer();
+
+        const { url: uploadedURL } = await uploadFile(db, user, {
+          buffer: resizedImageData,
+          filename: "profile.webp",
+          folder: "profiles",
+        });
+
+        url = uploadedURL;
+      } catch (error) {
+        console.error("Image transformation error:", error);
+
+        const { url: uploadedURL } = await uploadFile(db, user, {
+          buffer: arrayBuffer,
+          filename: file.name,
+          folder: "profiles",
+        });
+
+        url = uploadedURL;
+      }
+
+      if (!url) {
+        return NextResponse.json(
+          { error: "Failed to process image" },
+          { status: 500 }
+        );
+      }
 
       await db
         .update(schema.user)
