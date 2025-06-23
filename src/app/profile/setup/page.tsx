@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ChevronRight, AtSign, User, Briefcase, Image } from 'lucide-react';
+import { ChevronRight, AtSign, User, Briefcase, Image, Link as LinkIcon } from 'lucide-react';
 import {
   Card,
   CardDescription,
@@ -106,6 +106,24 @@ export default function ProfileSetupPage() {
                   <div>
                     <h3 className="font-medium text-lg">Profile Picture</h3>
                     <p className="text-muted-foreground">Upload or update your profile photo</p>
+                  </div>
+                </div>
+                <ChevronRight className="h-5 w-5 text-muted-foreground" />
+              </div>
+            </Card>
+          </Link>
+
+          {/* Setup Shortened Links Option */}
+          <Link href="/profile/setup/links" className="block">
+            <Card className="p-6 hover:bg-accent/50 transition-colors">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="bg-primary/10 p-3 rounded-full">
+                    <LinkIcon className="h-6 w-6 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-medium text-lg">Shortened Links</h3>
+                    <p className="text-muted-foreground">Create and manage your shortened URLs</p>
                   </div>
                 </div>
                 <ChevronRight className="h-5 w-5 text-muted-foreground" />
