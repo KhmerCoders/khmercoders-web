@@ -69,3 +69,5 @@ export async function createShortenedLink(db: MainDatabase, input: NewShortenedL
 
   return result;
 }
+
+export type ShortenedLink = typeof schema.shortenedLinks.$inferSelect;

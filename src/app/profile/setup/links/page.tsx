@@ -27,7 +27,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/generated/dropdown-menu';
-import { urlSchema } from '@/services/shortened-links';
+import { ShortenedLink, urlSchema } from '@/services/shortened-links';
 import { z } from 'zod/v4';
 import { useForm } from 'react-hook-form';
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema';
@@ -40,17 +40,10 @@ import {
   FormMessage,
 } from '@/components/generated/form';
 import { Alert, AlertTitle, AlertDescription } from '@/components/generated/alert';
-
-type ShortenedLink = {
-  id: string;
-  originalUrl: string;
-  slug: string;
-  createdAt: Date;
-  updatedAt: Date;
-  deletedAt: Date | null;
-};
+import { createShortenedLinkAction, getUserShortenedLinksAction } from '@/actions/shortened-links';
 
 type FormData = z.infer<typeof urlSchema>;
+const URL_PREFIX = 'kcc.li';
 
 function CreateEditLinkDialog({
   isOpen,
@@ -144,7 +137,7 @@ function CreateEditLinkDialog({
                     <div className="mt-2 text-sm text-muted-foreground flex items-center gap-2">
                       <span>Preview:</span>
                       <code className="px-2 py-1 bg-muted rounded-md font-mono">
-                        kcc.li/{slugValue}
+                        {URL_PREFIX}/{slugValue}
                       </code>
                     </div>
                   )}
@@ -181,11 +174,10 @@ export default function ShortenedLinksPage() {
   const fetchLinks = useCallback(async () => {
     try {
       setIsLoading(true);
-      const response = await fetch('/api/shortened-links');
-      if (!response.ok) {
-        throw new Error('Failed to fetch links');
+      const result = await getUserShortenedLinksAction();
+      if (!result.success) {
+        setError(result.message);
       }
-      const result = (await response.json()) as { data: ShortenedLink[] };
       setData(result.data);
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Failed to fetch links');
@@ -204,60 +196,27 @@ export default function ShortenedLinksPage() {
   };
 
   const handleCreate = async (formData: FormData) => {
-    const response = await fetch('/api/shortened-links', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(formData),
-    });
-
-    if (!response.ok) {
-      const error = (await response.json()) as { error: string };
-      throw new Error(error.error || 'Failed to create link');
+    const result = await createShortenedLinkAction(formData);
+    if (!result.success) {
+      throw new Error(result.message);
     }
-
     await fetchLinks();
   };
 
   const handleEdit = async (formData: FormData) => {
-    if (!linkToEdit) return;
-
-    const response = await fetch(`/api/shortened-links/${linkToEdit.id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(formData),
-    });
-
-    if (!response.ok) {
-      const error = (await response.json()) as { error: string };
-      throw new Error(error.error || 'Failed to update link');
-    }
-
-    await fetchLinks();
+    // TODO: Implement edit functionality
+    console.log('Edit functionality not implemented yet');
   };
 
   const handleDelete = async () => {
-    if (!linkToDelete) return;
-
-    try {
-      const response = await fetch(`/api/shortened-links/${linkToDelete}`, {
-        method: 'DELETE',
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to delete link');
-      }
-
-      await fetchLinks();
-    } catch (error) {
-      setError(error instanceof Error ? error.message : 'Failed to delete link');
-    } finally {
-      setDeleteConfirmOpen(false);
-      setLinkToDelete(null);
-    }
+    // TODO: Implement delete functionality
+    console.log('Delete functionality not implemented yet');
+    setDeleteConfirmOpen(false);
+    setLinkToDelete(null);
   };
 
   const copyToClipboard = async (slug: string) => {
-    const url = `${window.location.origin}/${slug}`;
+    const url = `${URL_PREFIX}/${slug}`;
     await navigator.clipboard.writeText(url);
   };
 
@@ -324,13 +283,13 @@ export default function ShortenedLinksPage() {
                   >
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-2">
-                        <span className="font-medium">{`kcc.li/${link.slug}`}</span>
+                        <span className="font-medium">{`${URL_PREFIX}/${link.slug}`}</span>
                         <Button
                           variant="ghost"
                           size="sm"
                           className="h-6 w-6 p-0 relative"
                           onClick={async () => {
-                            await copyToClipboard(`kcc.li/${link.slug}`);
+                            await copyToClipboard(`${URL_PREFIX}/${link.slug}`);
                             setCopiedId(link.id);
                             setTimeout(() => setCopiedId(null), 2000);
                           }}
