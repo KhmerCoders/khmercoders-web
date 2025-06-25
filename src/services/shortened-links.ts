@@ -51,23 +51,32 @@ export async function getShortenedLinkByUserId(db: MainDatabase, userId: string)
 
 type NewShortenedLink = CreateShortenedLinkInput & { userId: string };
 
-export async function createShortenedLink(db: MainDatabase, input: NewShortenedLink) {
+export async function createShortenedLink(
+  db: MainDatabase,
+  input: NewShortenedLink,
+  env: { KV: KVNamespace }
+) {
   const { url, slug, userId } = input;
   const shortId = nanoid(10);
+  const finalSlug = slug ?? shortId;
 
-  const [result] = await db
-    .insert(schema.shortenedLinks)
-    .values({
-      id: shortId,
-      originalUrl: url,
-      slug: slug ?? shortId,
-      userId,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    })
-    .returning();
+  return await db.transaction(async tx => {
+    const [result] = await tx
+      .insert(schema.shortenedLinks)
+      .values({
+        id: shortId,
+        originalUrl: url,
+        slug: finalSlug,
+        userId,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .returning();
 
-  return result;
+    await env.KV.put(finalSlug, url);
+
+    return result;
+  });
 }
 
 export type ShortenedLink = typeof schema.shortenedLinks.$inferSelect;
