@@ -20,15 +20,14 @@ import {
   AlertDialogTitle,
 } from '@/components/generated/alert-dialog';
 import { useCallback, useEffect, useState } from 'react';
-import { MoreHorizontal, Pencil, Trash2, ExternalLink, Check, Copy } from 'lucide-react';
+import { MoreHorizontal, Pencil, Trash2, ExternalLink, Check, Copy, BarChart2 } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/generated/dropdown-menu';
-import { ShortenedLink, urlSchema } from '@/services/shortened-links';
-import { z } from 'zod/v4';
+import { ShortenedLink, ShortenedLinkInput, urlSchema } from '@/services/shortened-links';
 import { useForm } from 'react-hook-form';
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema';
 import {
@@ -41,8 +40,8 @@ import {
 } from '@/components/generated/form';
 import { Alert, AlertTitle, AlertDescription } from '@/components/generated/alert';
 import { createShortenedLinkAction, getUserShortenedLinksAction } from '@/actions/shortened-links';
+import { useRouter } from 'next/navigation';
 
-type FormData = z.infer<typeof urlSchema>;
 const URL_PREFIX = 'kcc.li';
 
 function CreateEditLinkDialog({
@@ -54,14 +53,14 @@ function CreateEditLinkDialog({
 }: {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: FormData) => Promise<void>;
+  onSubmit: (data: ShortenedLinkInput) => Promise<void>;
   initialData?: ShortenedLink;
   isEditing?: boolean;
 }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const form = useForm<FormData>({
+  const form = useForm<ShortenedLinkInput>({
     resolver: standardSchemaResolver(urlSchema),
     defaultValues: {
       url: initialData?.originalUrl || '',
@@ -71,7 +70,7 @@ function CreateEditLinkDialog({
 
   const slugValue = form.watch('slug');
 
-  const handleSubmit = async (data: FormData) => {
+  const handleSubmit = async (data: ShortenedLinkInput) => {
     try {
       setIsLoading(true);
       setError(null);
@@ -170,6 +169,7 @@ export default function ShortenedLinksPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const router = useRouter();
 
   const fetchLinks = useCallback(async () => {
     try {
@@ -195,7 +195,7 @@ export default function ShortenedLinksPage() {
     setLinkToEdit(null);
   };
 
-  const handleCreate = async (formData: FormData) => {
+  const handleCreate = async (formData: ShortenedLinkInput) => {
     const result = await createShortenedLinkAction(formData);
     if (!result.success) {
       throw new Error(result.message);
@@ -203,7 +203,7 @@ export default function ShortenedLinksPage() {
     await fetchLinks();
   };
 
-  const handleEdit = async (formData: FormData) => {
+  const handleEdit = async (formData: ShortenedLinkInput) => {
     // TODO: Implement edit functionality
     console.log('Edit functionality not implemented yet');
   };
@@ -330,6 +330,16 @@ export default function ShortenedLinksPage() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end" className="w-36">
+                            <DropdownMenuItem
+                              className="cursor-pointer"
+                              onSelect={() => {
+                                setOpenDropdownId(null);
+                                router.push(`/profile/setup/links/${link.slug}/insights`);
+                              }}
+                            >
+                              <BarChart2 className="mr-2 h-4 w-4" />
+                              View Insights
+                            </DropdownMenuItem>
                             <DropdownMenuItem
                               className="cursor-pointer"
                               onSelect={() => {

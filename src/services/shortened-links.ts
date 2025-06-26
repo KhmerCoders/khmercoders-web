@@ -32,6 +32,8 @@ export const urlSchema = z.object({
     ),
 });
 
+export type ShortenedLinkInput = z.infer<typeof urlSchema>;
+
 export type CreateShortenedLinkInput = z.infer<typeof urlSchema>;
 
 export async function getShortenedLinkBySlug(db: MainDatabase, slug: string) {

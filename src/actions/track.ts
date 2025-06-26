@@ -15,7 +15,7 @@ export async function trackProfileVisitAction({
   const headerContext = await headers();
 
   console.log('Tracking profile visit for user:', userId, 'Referrer:', referrer);
-
+  
   if (cf && headerContext && env.PROFILE_ANALYTICS) {
     const countryCode = cf.country;
     const deviceType = headerContext.get('cf-device-type') || 'unknown';

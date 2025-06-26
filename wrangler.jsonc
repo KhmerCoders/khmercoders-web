@@ -6,20 +6,20 @@
   "compatibility_flags": ["nodejs_compat"],
   "assets": {
     "directory": ".open-next/assets",
-    "binding": "ASSETS"
+    "binding": "ASSETS",
   },
   "observability": {
     "enabled": true,
-    "head_sampling_rate": 1
+    "head_sampling_rate": 1,
   },
   "r2_buckets": [
     {
       "binding": "USER_UPLOADS",
-      "bucket_name": "khmercoders-bucket"
-    }
+      "bucket_name": "khmercoders-bucket",
+    },
   ],
   "images": {
-    "binding": "IMAGES"
+    "binding": "IMAGES",
   },
   "d1_databases": [
     {
@@ -27,24 +27,28 @@
       "database_name": "khmercoders",
       "database_id": "8a80951e-1838-4a5d-b810-b113d1a3d9a1",
       "migrations_table": "__drizzle_migrations",
-      "migrations_dir": "drizzle"
+      "migrations_dir": "drizzle",
     },
     {
       "binding": "DB_CHATBOT",
       "database_name": "kcc-chatbot",
-      "database_id": "48058eec-0cb2-42e7-a166-6bc3cca3c686"
-    }
+      "database_id": "48058eec-0cb2-42e7-a166-6bc3cca3c686",
+    },
   ],
   "kv_namespaces": [
     {
       "binding": "KV",
-      "id": "4a1cb635d683447c8b90a31a7e2c08e0"
-    }
+      "id": "4a1cb635d683447c8b90a31a7e2c08e0",
+    },
   ],
   "analytics_engine_datasets": [
     {
       "binding": "PROFILE_ANALYTICS",
-      "dataset": "profile_analytics"
-    }
-  ]
+      "dataset": "profile_analytics",
+    },
+    {
+      "binding": "SHORTLINK_ANALYTICS",
+      "dataset": "shortlink-analytics",
+    },
+  ],
 }

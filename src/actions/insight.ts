@@ -91,7 +91,7 @@ export const getCurrentProfileInsightAction = withAuthAction(async ({ user }) =>
   };
 });
 
-async function requestWorkerAnalytic<T>(query: string): Promise<T[]> {
+export async function requestWorkerAnalytic<T>(query: string): Promise<T[]> {
   const response = await fetch(
     `https://api.cloudflare.com/client/v4/accounts/${process.env.ACCOUNT_ID}/analytics_engine/sql`,
     {
