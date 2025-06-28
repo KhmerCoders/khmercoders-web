@@ -20,7 +20,16 @@ import {
   AlertDialogTitle,
 } from '@/components/generated/alert-dialog';
 import { useCallback, useEffect, useState } from 'react';
-import { MoreHorizontal, Pencil, Trash2, ExternalLink, Check, Copy, BarChart2 } from 'lucide-react';
+import {
+  MoreHorizontal,
+  Pencil,
+  Trash2,
+  Check,
+  Copy,
+  BarChart2,
+  QrCode,
+  Share,
+} from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -46,8 +55,71 @@ import {
   deleteShortenedLinkAction,
 } from '@/actions/shortened-links';
 import { useRouter } from 'next/navigation';
+import { QRCodeSVG } from 'qrcode.react';
 
 const URL_PREFIX = 'kcc.li';
+
+function QRCodeDialog({
+  isOpen,
+  onClose,
+  slug,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  slug: string;
+}) {
+  const absoluteUrl = new URL(slug, 'https://kcc.li').toString();
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(absoluteUrl);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleShare = async () => {
+    try {
+      await navigator.share({
+        title: 'Shortened Link',
+        text: 'Check out this link',
+        url: absoluteUrl,
+      });
+    } catch (error) {
+      console.error('Error sharing:', error);
+    }
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
+      <DialogContent className="sm:max-w-[425px] flex flex-col items-center">
+        <DialogHeader className="w-full text-center">
+          <DialogTitle>QR Code</DialogTitle>
+          <DialogDescription>Scan this QR code to access the shortened link</DialogDescription>
+        </DialogHeader>
+        <div className="flex flex-col items-center gap-4 py-4">
+          <div className="bg-white p-4 rounded-lg">
+            <QRCodeSVG value={absoluteUrl} size={256} level="H" />
+          </div>
+          <div className="text-sm text-muted-foreground">{`${URL_PREFIX}/${slug}`}</div>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={handleCopy}>
+              {copied ? (
+                <Check className="h-4 w-4 mr-2 text-green-500" />
+              ) : (
+                <Copy className="h-4 w-4 mr-2" />
+              )}
+              {copied ? 'Copied!' : 'Copy Link'}
+            </Button>
+            <Button variant="default" size="sm" onClick={handleShare}>
+              <Share className="h-4 w-4 mr-2" />
+              Share
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
 
 function CreateEditLinkDialog({
   isOpen,
@@ -184,6 +256,8 @@ export default function ShortenedLinksPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [qrCodeDialogOpen, setQrCodeDialogOpen] = useState(false);
+  const [qrCodeLink, setQrCodeLink] = useState('');
   const router = useRouter();
 
   const fetchLinks = useCallback(async () => {
@@ -368,7 +442,18 @@ export default function ShortenedLinksPage() {
                               }}
                             >
                               <BarChart2 className="mr-2 h-4 w-4" />
-                              Insights
+                              View Insights
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              className="cursor-pointer"
+                              onSelect={() => {
+                                setOpenDropdownId(null);
+                                setQrCodeLink(link.slug);
+                                setQrCodeDialogOpen(true);
+                              }}
+                            >
+                              <QrCode className="mr-2 h-4 w-4" />
+                              QR
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               className="cursor-pointer"
@@ -426,6 +511,12 @@ export default function ShortenedLinksPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <QRCodeDialog
+        isOpen={qrCodeDialogOpen}
+        onClose={() => setQrCodeDialogOpen(false)}
+        slug={qrCodeLink}
+      />
     </div>
   );
 }
