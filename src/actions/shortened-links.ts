@@ -1,15 +1,19 @@
 'use server';
 import { withAuthAction } from './middleware';
-import { ShortenedLink, ShortenedLinkInput, urlSchema } from '@/services/shortened-links';
+import {
+  getShortenedLinkByIdAndUser,
+  ShortenedLink,
+  ShortenedLinkInput,
+  urlSchema,
+} from '@/services/shortened-links';
 import {
   createShortenedLink,
   getShortenedLinkBySlug,
   getShortenedLinkByUserId,
   updateShortenedLink,
+  deleteShortenedLink,
 } from '@/services/shortened-links';
 import { requestWorkerAnalytic } from './insight';
-import { and, eq } from 'drizzle-orm';
-import { shortenedLinks } from '@/libs/db/schema';
 
 /**
  * Server action to create a new shortened link for the authenticated user
@@ -256,9 +260,7 @@ export const updateShortenedLinkAction = withAuthAction(
       }
 
       // Check if the link exists and belongs to the user
-      const existingLink = await db.query.shortenedLinks.findFirst({
-        where: and(eq(shortenedLinks.id, id), eq(shortenedLinks.userId, user.id)),
-      });
+      const existingLink = await getShortenedLinkByIdAndUser(db, id, user.id);
 
       if (!existingLink) {
         return {
@@ -288,3 +290,34 @@ export const updateShortenedLinkAction = withAuthAction(
     }
   }
 );
+
+/**
+ * Server action to delete a shortened link
+ */
+export const deleteShortenedLinkAction = withAuthAction(async ({ db, user, env }, id: string) => {
+  try {
+    // Check if the link exists and belongs to the user
+    const existingLink = await getShortenedLinkByIdAndUser(db, id, user.id);
+
+    if (!existingLink) {
+      return {
+        success: false,
+        message: "Link not found or you don't have permission to delete it.",
+      };
+    }
+
+    const result = await deleteShortenedLink(db, id, { KV: env.KV });
+
+    return {
+      success: true,
+      message: 'Shortened link deleted successfully.',
+      data: result,
+    };
+  } catch (error) {
+    console.error('Failed to delete shortened link:', error);
+    return {
+      success: false,
+      message: 'Failed to delete shortened link. Please try again later.',
+    };
+  }
+});

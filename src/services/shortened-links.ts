@@ -1,8 +1,8 @@
 import { nanoid } from 'nanoid';
 import { z } from 'zod/v4';
-import * as schema from '@/libs/db/schema';
 import { MainDatabase } from '@/types';
-import { eq, desc } from 'drizzle-orm';
+import { eq, desc, and, isNull } from 'drizzle-orm';
+import { shortenedLinks } from '@/libs/db/schema';
 
 // IETF RFC 3986 Section 2.3:
 // "Characters that are allowed in a URI but do not have a reserved
@@ -38,17 +38,32 @@ export type CreateShortenedLinkInput = z.infer<typeof urlSchema>;
 
 export async function getShortenedLinkBySlug(db: MainDatabase, slug: string) {
   const result = await db.query.shortenedLinks.findFirst({
-    where: eq(schema.shortenedLinks.slug, slug),
+    where: and(eq(shortenedLinks.slug, slug), isNull(shortenedLinks.deletedAt)),
   });
   return result;
 }
 
 export async function getShortenedLinkByUserId(db: MainDatabase, userId: string) {
   const result = await db.query.shortenedLinks.findMany({
-    where: eq(schema.shortenedLinks.userId, userId),
-    orderBy: desc(schema.shortenedLinks.createdAt),
+    where: and(eq(shortenedLinks.userId, userId), isNull(shortenedLinks.deletedAt)),
+    orderBy: desc(shortenedLinks.createdAt),
   });
   return result;
+}
+
+export async function getShortenedLinkByIdAndUser(
+  db: MainDatabase,
+  id: string,
+  userId: string,
+  includeDeleted = false
+) {
+  return await db.query.shortenedLinks.findFirst({
+    where: and(
+      eq(shortenedLinks.id, id),
+      eq(shortenedLinks.userId, userId),
+      includeDeleted ? undefined : isNull(shortenedLinks.deletedAt)
+    ),
+  });
 }
 
 type NewShortenedLink = CreateShortenedLinkInput & { userId: string };
@@ -64,7 +79,7 @@ export async function createShortenedLink(
 
   return await db.transaction(async tx => {
     const [result] = await tx
-      .insert(schema.shortenedLinks)
+      .insert(shortenedLinks)
       .values({
         id: shortId,
         originalUrl: url,
@@ -100,12 +115,12 @@ export async function updateShortenedLink(
   env: { KV: KVNamespace }
 ) {
   const [link] = await db
-    .update(schema.shortenedLinks)
+    .update(shortenedLinks)
     .set({
       originalUrl: input.url,
       updatedAt: new Date(),
     })
-    .where(eq(schema.shortenedLinks.id, id))
+    .where(eq(shortenedLinks.id, id))
     .returning();
 
   if (link) {
@@ -115,4 +130,21 @@ export async function updateShortenedLink(
   return link;
 }
 
-export type ShortenedLink = typeof schema.shortenedLinks.$inferSelect;
+export async function deleteShortenedLink(db: MainDatabase, id: string, env: { KV: KVNamespace }) {
+  const [link] = await db
+    .update(shortenedLinks)
+    .set({
+      deletedAt: new Date(),
+    })
+    .where(eq(shortenedLinks.id, id))
+    .returning();
+
+  if (link) {
+    // Remove from KV store
+    await env.KV.delete(link.slug);
+  }
+
+  return link;
+}
+
+export type ShortenedLink = typeof shortenedLinks.$inferSelect;

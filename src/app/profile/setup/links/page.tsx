@@ -43,6 +43,7 @@ import {
   createShortenedLinkAction,
   getUserShortenedLinksAction,
   updateShortenedLinkAction,
+  deleteShortenedLinkAction,
 } from '@/actions/shortened-links';
 import { useRouter } from 'next/navigation';
 
@@ -74,6 +75,7 @@ function CreateEditLinkDialog({
         url: initialData.originalUrl,
         slug: initialData.slug,
       });
+      return;
     }
     form.reset({
       url: '',
@@ -227,10 +229,20 @@ export default function ShortenedLinksPage() {
   };
 
   const handleDelete = async () => {
-    // TODO: Implement delete functionality
-    console.log('Delete functionality not implemented yet');
-    setDeleteConfirmOpen(false);
-    setLinkToDelete(null);
+    if (!linkToDelete) return;
+
+    try {
+      const result = await deleteShortenedLinkAction(linkToDelete);
+      if (!result.success) {
+        throw new Error(result.message);
+      }
+      await fetchLinks();
+    } catch (error) {
+      console.error('Failed to delete link:', error);
+    } finally {
+      setDeleteConfirmOpen(false);
+      setLinkToDelete(null);
+    }
   };
 
   const copyToClipboard = async (slug: string) => {
