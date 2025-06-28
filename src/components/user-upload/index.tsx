@@ -72,23 +72,20 @@ export function UserUpload({ onSelect, onClose, mode }: UserUploadProps) {
 }
 
 function FileUploadTabContent({ onSelect }: { onSelect: (file: string) => void }) {
-  const [file, setFile] = useState<File | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = event.target.files?.[0];
-    if (selectedFile) {
-      setFile(selectedFile);
+    const selectedFiles = event.target.files ? Array.from(event.target.files) : [];
+    setFiles(selectedFiles);
+  };
 
-      if (selectedFile.type.startsWith('image/')) {
-        const url = URL.createObjectURL(selectedFile);
-        setPreviewUrl(url);
-      } else {
-        setPreviewUrl(null);
-      }
-    }
+  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    setIsDragOver(false);
+    const droppedFiles = Array.from(event.dataTransfer.files);
+    setFiles(droppedFiles);
   };
 
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
@@ -101,26 +98,8 @@ function FileUploadTabContent({ onSelect }: { onSelect: (file: string) => void }
     setIsDragOver(false);
   };
 
-  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    setIsDragOver(false);
-
-    const droppedFiles = event.dataTransfer.files;
-    if (droppedFiles.length > 0) {
-      const selectedFile = droppedFiles[0];
-      setFile(selectedFile);
-
-      if (selectedFile.type.startsWith('image/')) {
-        const url = URL.createObjectURL(selectedFile);
-        setPreviewUrl(url);
-      } else {
-        setPreviewUrl(null);
-      }
-    }
-  };
-
   const handleUpload = async () => {
-    if (!file) return;
+    if (files.length === 0) return;
 
     setUploadProgress(0);
 
@@ -134,37 +113,39 @@ function FileUploadTabContent({ onSelect }: { onSelect: (file: string) => void }
       });
     }, 200); // Update progress every 200ms
 
-    const formData = new FormData();
-    formData.append('file', file);
-
     try {
-      const response = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
-        headers: {
-          Accept: 'application/json',
-        },
-      });
+      const uploadedUrls: string[] = [];
 
-      if (!response.ok) {
-        throw new Error('Upload failed');
+      for (const file of files) {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const response = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData,
+          headers: {
+            Accept: 'application/json',
+          },
+        });
+
+        if (!response.ok) throw new Error('Upload failed');
+        const json = (await response.json()) as { url: string };
+        uploadedUrls.push(json.url);
       }
-
-      const json = (await response.json()) as { url: string };
 
       clearInterval(fakeProgressInterval);
       setUploadProgress(100); // Set progress to 100% on successful upload
+
       setTimeout(() => {
         setUploadProgress(null);
-        setFile(null);
-        setPreviewUrl(null);
-        onSelect(json.url);
+        setFiles([]);
+        onSelect(uploadedUrls[0]);
       }, 500); // Small delay to show 100% progress
     } catch (error) {
       clearInterval(fakeProgressInterval);
       setUploadProgress(null);
       console.error(error);
-      alert('Failed to upload file');
+      alert('Failed to upload file(s)');
     }
   };
 
@@ -199,19 +180,37 @@ function FileUploadTabContent({ onSelect }: { onSelect: (file: string) => void }
           </p>
           <p className="text-xs text-muted-foreground">PNG, JPG, GIF up to 10MB</p>
         </div>
-        <input id="file-upload" type="file" className="hidden" onChange={handleFileChange} />
+        <input
+          id="file-upload"
+          type="file"
+          className="hidden"
+          multiple
+          onChange={handleFileChange}
+        />
       </div>
 
-      {file && (
-        <div className="mt-4 flex flex-col items-center">
-          {previewUrl ? (
-            <img src={previewUrl} alt="Preview" className="w-32 h-32 object-cover rounded-lg" />
-          ) : (
-            <div className="flex items-center gap-2">
-              <File className="w-5 h-5" />
-              <span>{file.name}</span>
-            </div>
-          )}
+      {files.length > 0 && (
+        <div className="mt-4 flex flex-wrap gap-4 justify-center">
+          {files.map((file, index) => {
+            const previewUrl = file.type.startsWith('image/') ? URL.createObjectURL(file) : null;
+
+            return (
+              <div key={index} className="flex flex-col items-center">
+                {previewUrl ? (
+                  <img
+                    src={previewUrl}
+                    alt={`Preview ${index}`}
+                    className="w-32 h-32 object-cover rounded-lg"
+                  />
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <File className="w-5 h-5" />
+                    <span>{file.name}</span>
+                  </div>
+                )}
+              </div>
+            );
+          })}
           <button
             onClick={handleUpload}
             className="mt-4 px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600"
@@ -255,24 +254,18 @@ function FileListTabContent({
         </TableRow>
       </TableHeader>
       <TableBody>
-        {files.map(file => {
-          return (
-            <TableRow
-              className="cursor-pointer"
-              onClick={() => onSelect(file.fileUrl)}
-              key={file.id}
-            >
-              <TableCell>
-                <div className="flex gap-2 items-center line-clamp-1">
-                  {renderIconFromContentType(file.fileType)}
-                  {file.fileName}
-                </div>
-              </TableCell>
-              <TableCell className="text-right">{formatSize(file.fileSize)}</TableCell>
-              <TableCell>{formatAgo(file.createdAt)}</TableCell>
-            </TableRow>
-          );
-        })}
+        {files.map(file => (
+          <TableRow key={file.id} className="cursor-pointer" onClick={() => onSelect(file.fileUrl)}>
+            <TableCell>
+              <div className="flex gap-2 items-center line-clamp-1">
+                {renderIconFromContentType(file.fileType)}
+                {file.fileName}
+              </div>
+            </TableCell>
+            <TableCell className="text-right">{formatSize(file.fileSize)}</TableCell>
+            <TableCell>{formatAgo(file.createdAt)}</TableCell>
+          </TableRow>
+        ))}
       </TableBody>
     </Table>
   );
