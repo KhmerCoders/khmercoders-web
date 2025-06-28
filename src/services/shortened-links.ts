@@ -81,4 +81,38 @@ export async function createShortenedLink(
   });
 }
 
+/**
+ * Known issue: Not Atomic, Probably Will fixed later
+ * does env.KV.put(link.slug, input.url); even throw if it fails to update?
+ * when using transaction,will give the following error:
+ * Failed to update shortened link
+ * Error: D1_ERROR: To execute a transaction, please use the state.storage.transaction()
+ * or state.storage.transactionSync() APIs instead of the SQL BEGIN TRANSACTION or
+ * SAVEPOINT statements. The JavaScript API is safer because it will automatically
+ * roll back on exceptions, and because it interacts correctly with Durable Objects'
+ * automatic atomic write coalescing.
+ */
+
+export async function updateShortenedLink(
+  db: MainDatabase,
+  id: string,
+  input: { url: string },
+  env: { KV: KVNamespace }
+) {
+  const [link] = await db
+    .update(schema.shortenedLinks)
+    .set({
+      originalUrl: input.url,
+      updatedAt: new Date(),
+    })
+    .where(eq(schema.shortenedLinks.id, id))
+    .returning();
+
+  if (link) {
+    await env.KV.put(link.slug, input.url);
+  }
+
+  return link;
+}
+
 export type ShortenedLink = typeof schema.shortenedLinks.$inferSelect;

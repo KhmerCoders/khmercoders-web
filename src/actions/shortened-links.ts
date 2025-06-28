@@ -5,8 +5,11 @@ import {
   createShortenedLink,
   getShortenedLinkBySlug,
   getShortenedLinkByUserId,
+  updateShortenedLink,
 } from '@/services/shortened-links';
 import { requestWorkerAnalytic } from './insight';
+import { and, eq } from 'drizzle-orm';
+import { shortenedLinks } from '@/libs/db/schema';
 
 /**
  * Server action to create a new shortened link for the authenticated user
@@ -232,6 +235,55 @@ export const getLinkInsightsAction = withAuthAction<[string], GetLinkInsightsRet
       return {
         success: false,
         message: 'Failed to fetch link insights. Please try again later.',
+      };
+    }
+  }
+);
+
+/**
+ * Server action to update an existing shortened link
+ */
+export const updateShortenedLinkAction = withAuthAction(
+  async ({ db, user, env }, id: string, data: ShortenedLinkInput) => {
+    try {
+      const validatedData = urlSchema.safeParse(data);
+      if (!validatedData.success) {
+        return {
+          success: false,
+          message: 'Invalid link data. Please check your inputs.',
+          details: validatedData.error,
+        };
+      }
+
+      // Check if the link exists and belongs to the user
+      const existingLink = await db.query.shortenedLinks.findFirst({
+        where: and(eq(shortenedLinks.id, id), eq(shortenedLinks.userId, user.id)),
+      });
+
+      if (!existingLink) {
+        return {
+          success: false,
+          message: "Link not found or you don't have permission to edit it.",
+        };
+      }
+
+      const result = await updateShortenedLink(
+        db,
+        id,
+        { url: validatedData.data.url },
+        { KV: env.KV }
+      );
+
+      return {
+        success: true,
+        message: 'Shortened link updated successfully.',
+        data: result,
+      };
+    } catch (error) {
+      console.error('Failed to update shortened link:', error);
+      return {
+        success: false,
+        message: 'Failed to update shortened link. Please try again later.',
       };
     }
   }

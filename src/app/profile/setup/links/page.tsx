@@ -39,7 +39,11 @@ import {
   FormMessage,
 } from '@/components/generated/form';
 import { Alert, AlertTitle, AlertDescription } from '@/components/generated/alert';
-import { createShortenedLinkAction, getUserShortenedLinksAction } from '@/actions/shortened-links';
+import {
+  createShortenedLinkAction,
+  getUserShortenedLinksAction,
+  updateShortenedLinkAction,
+} from '@/actions/shortened-links';
 import { useRouter } from 'next/navigation';
 
 const URL_PREFIX = 'kcc.li';
@@ -62,11 +66,20 @@ function CreateEditLinkDialog({
 
   const form = useForm<ShortenedLinkInput>({
     resolver: standardSchemaResolver(urlSchema),
-    defaultValues: {
-      url: initialData?.originalUrl || '',
-      slug: initialData?.slug || '',
-    },
   });
+
+  useEffect(() => {
+    if (initialData) {
+      form.reset({
+        url: initialData.originalUrl,
+        slug: initialData.slug,
+      });
+    }
+    form.reset({
+      url: '',
+      slug: '',
+    });
+  }, [form, initialData]);
 
   const slugValue = form.watch('slug');
 
@@ -204,8 +217,13 @@ export default function ShortenedLinksPage() {
   };
 
   const handleEdit = async (formData: ShortenedLinkInput) => {
-    // TODO: Implement edit functionality
-    console.log('Edit functionality not implemented yet');
+    if (!linkToEdit) return;
+
+    const result = await updateShortenedLinkAction(linkToEdit.id, formData);
+    if (!result.success) {
+      throw new Error(result.message);
+    }
+    await fetchLinks();
   };
 
   const handleDelete = async () => {
@@ -338,7 +356,7 @@ export default function ShortenedLinksPage() {
                               }}
                             >
                               <BarChart2 className="mr-2 h-4 w-4" />
-                              View Insights
+                              Insights
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               className="cursor-pointer"
