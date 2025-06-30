@@ -9,6 +9,13 @@ const extensionToMimeType: Record<string, string> = {
   tar: 'application/x-tar',
   gz: 'application/gzip',
   pdf: 'application/pdf',
+  mp4: 'video/mp4',
+  mov: 'video/quicktime',
+  avi: 'video/x-msvideo',
+  mkv: 'video/x-matroska',
+  txt: 'text/plain',
+  csv: 'text/csv',
+  json: 'application/json',
 };
 
 export function getContentTypeFromExtension(extension: string): string {

@@ -1,3 +1,4 @@
+import { KV_TELERAM_MEMBER_COUNT } from '@/constants';
 import { KCLinks } from '@/data/link';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 import Link from 'next/link';
@@ -11,7 +12,7 @@ export async function HomeHeroBanner() {
     'facebook_member_count',
   ]);
 
-  const telegramMemberCount = Number(counter.get('telegram_member_count') || 0);
+  const telegramMemberCount = Number(counter.get(KV_TELERAM_MEMBER_COUNT) || 0);
   const discordMemberCount = Number(counter.get('discord_member_count') || 0);
   const facebookMemberCount = Number(counter.get('facebook_member_count') || 0);
 

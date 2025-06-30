@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "main": ".open-next/worker.js",
+  "main": "./custom-worker.ts",
   "name": "khmercoders-web",
   "compatibility_date": "2024-12-30",
   "compatibility_flags": ["nodejs_compat"],
@@ -11,6 +11,11 @@
   "observability": {
     "enabled": true,
     "head_sampling_rate": 1,
+  },
+  "triggers": {
+    "crons": [
+      "0 */2 * * *"
+    ]
   },
   "r2_buckets": [
     {
@@ -51,4 +56,5 @@
       "dataset": "shortlink-analytics",
     },
   ],
+  "keep_vars": true,
 }

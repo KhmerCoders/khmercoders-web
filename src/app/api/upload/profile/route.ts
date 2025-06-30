@@ -3,7 +3,7 @@ import { withApiAuth, ApiAuthContext } from '../../middleware';
 import * as schema from '@/libs/db/schema';
 import { z } from 'zod';
 import { eq } from 'drizzle-orm';
-import { uploadFile } from '@/services/upload';
+import { syncUploadsToResource, uploadFile } from '@/services/upload';
 
 // Schema for file validation
 const fileSchema = z.object({
@@ -66,6 +66,7 @@ export const POST = withApiAuth(async (req: NextRequest, { env, user, db }: ApiA
     });
 
     let url = '';
+    let fileUploadId = '';
 
     try {
       // Use the Cloudflare Images binding to transform the image
@@ -88,23 +89,25 @@ export const POST = withApiAuth(async (req: NextRequest, { env, user, db }: ApiA
       const resizedImageResponse = result.response();
       resizedImageData = await resizedImageResponse.arrayBuffer();
 
-      const { url: uploadedURL } = await uploadFile(db, user, {
+      const { id: uploadId, url: uploadedURL } = await uploadFile(db, user, {
         buffer: resizedImageData,
         filename: 'profile.webp',
         folder: 'profiles',
       });
 
       url = uploadedURL;
+      fileUploadId = uploadId;
     } catch (error) {
       console.error('Image transformation error:', error);
 
-      const { url: uploadedURL } = await uploadFile(db, user, {
+      const { id: uploadId, url: uploadedURL } = await uploadFile(db, user, {
         buffer: arrayBuffer,
         filename: file.name,
         folder: 'profiles',
       });
 
       url = uploadedURL;
+      fileUploadId = uploadId;
     }
 
     if (!url) {
@@ -117,6 +120,8 @@ export const POST = withApiAuth(async (req: NextRequest, { env, user, db }: ApiA
         image: url,
       })
       .where(eq(schema.user.id, user.id));
+
+    await syncUploadsToResource(user.id, [fileUploadId], 'profile', 'profile');
 
     // Return the URL and path of the uploaded file
     return NextResponse.json({

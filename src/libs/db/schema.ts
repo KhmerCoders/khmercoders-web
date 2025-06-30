@@ -1,5 +1,6 @@
-import { UserLevel } from '@/types';
-import { sqliteTable, text, integer, index } from 'drizzle-orm/sqlite-core';
+import { UserLevel, BindingResourceType } from '@/types';
+import { relations } from 'drizzle-orm';
+import { sqliteTable, text, integer, index, primaryKey } from 'drizzle-orm/sqlite-core';
 
 export const user = sqliteTable('user', {
   id: text('id').primaryKey(),
@@ -128,3 +129,33 @@ export const shortenedLinks = sqliteTable('shortened_links', {
   updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull(),
   deletedAt: integer('deleted_at', { mode: 'timestamp' }),
 });
+
+export const userUploadBinding = sqliteTable(
+  'user_upload_binding',
+  {
+    resourceType: text('resource_type').notNull().$type<BindingResourceType>(),
+    resourceId: text('resource_id').notNull(),
+    userUploadId: text('user_upload_id')
+      .notNull()
+      .references(() => userUpload.id),
+    createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
+  },
+  table => [
+    primaryKey({
+      columns: [table.resourceType, table.resourceId, table.userUploadId],
+    }),
+    index('user_upload_binding_user_upload_id_idx').on(table.userUploadId),
+  ]
+);
+
+// Relations
+export const userUploadRelationship = relations(userUpload, ({ one, many }) => ({
+  bindings: many(userUploadBinding),
+}));
+
+export const userUploadBindingRelationship = relations(userUploadBinding, ({ one }) => ({
+  userUpload: one(userUpload, {
+    fields: [userUploadBinding.userUploadId],
+    references: [userUpload.id],
+  }),
+}));

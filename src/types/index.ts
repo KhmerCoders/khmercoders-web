@@ -64,6 +64,12 @@ export enum UserLevel {
   SuperAdmin = 20,
 }
 
+export type BindingResourceType = 'profile' | 'blog';
+
 export type MainDatabase = DrizzleD1Database<typeof schema>;
 export type UserRecord = typeof schema.user.$inferSelect;
 export type ExperienceRecord = typeof schema.workExperience.$inferSelect;
+export type UserUploadRecord = typeof schema.userUpload.$inferSelect;
+export type UserUploadRecordWithBinding = UserUploadRecord & {
+  bindings: (typeof schema.userUploadBinding.$inferSelect)[];
+};

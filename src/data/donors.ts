@@ -23,4 +23,9 @@ export const DonorDatabase: IDonor[] = [
   { name: 'Sopha Sum', trx: [{ date: '2025-03-29', amount: 100 }] },
   { name: 'Sokhna Vor', trx: [{ date: '2025-03-29', amount: 100 }] },
   { name: 'Kama Sos', trx: [{ date: '2025-04-29', amount: 50 }] },
+  { name: 'Han Junhee', trx: [{ date: '2025-06-16', amount: 500 }] },
+  { name: 'Kevin Sabbe', trx: [{ date: '2025-06-25', amount: 200 }] },
+  { name: 'Seu Samith', trx: [{ date: '2025-06-21', amount: 5 }] },
+  { name: 'Pich Chan Thorn', trx: [{ date: '2025-06-20', amount: 1 }] },
+  { name: 'Taing Chong Yean', trx: [{ date: '2025-06-19', amount: 1 }] },
 ];

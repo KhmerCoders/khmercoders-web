@@ -8,9 +8,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../generated/dropdown-menu';
-import { User, Settings } from 'lucide-react';
+import { User, Settings, ChartArea, Files } from 'lucide-react';
 import Link from 'next/link';
 import { useSession } from '../auth-provider';
+import { Badge } from '../generated/badge';
 
 export function UserAvatar() {
   const { profile, session } = useSession();
@@ -29,7 +30,7 @@ export function UserAvatar() {
           <AvatarFallback>{user.name?.[0] || 'U'}</AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
+      <DropdownMenuContent align="end" style={{ width: '300px' }}>
         <div className="flex items-center justify-start gap-2 p-2">
           <div className="flex flex-col space-y-1 leading-none">
             {user.name && <p className="font-medium">{user.name}</p>}
@@ -50,10 +51,21 @@ export function UserAvatar() {
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link href={'/profile/insight'} className="cursor-pointer">
-            <User className="mr-2 h-4 w-4" />
+            <ChartArea className="mr-2 h-4 w-4" />
             Profile Insight
           </Link>
         </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link href={'/profile/storage'} className="cursor-pointer">
+            <Files className="mr-2 h-4 w-4" />
+            Your Storage
+            <div className="grow flex justify-end">
+              <Badge>Beta</Badge>
+            </div>
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <Link href="/profile/setup" className="cursor-pointer">
             <Settings className="mr-2 h-4 w-4" />

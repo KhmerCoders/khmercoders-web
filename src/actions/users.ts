@@ -4,6 +4,10 @@ import { isValidAlias } from '@/utils/validate';
 import * as schema from '@/libs/db/schema';
 import { eq } from 'drizzle-orm';
 
+export const getUserAction = withAuthAction(async ({ db, user }) => {
+  return user;
+});
+
 export const updateUserAliasAction = withAuthAction(
   async ({ db, user, profile }, alias: string) => {
     // Validate alias

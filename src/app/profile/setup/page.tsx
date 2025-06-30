@@ -1,40 +1,14 @@
 'use client';
 
 import Link from 'next/link';
-import { ChevronRight, AtSign, User, Briefcase, Image, Link as LinkIcon } from 'lucide-react';
-import {
-  Card,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/generated/card';
-import { useSession } from '@/components/auth-provider';
-import { formatSize } from '@/utils/format';
+import { ChevronRight, AtSign, User, Briefcase, Image, LinkIcon } from 'lucide-react';
+import { Card } from '@/components/generated/card';
 
 export default function ProfileSetupPage() {
-  const { session } = useSession();
-
   return (
     <div className="container mx-auto py-8">
       <div className="max-w-3xl mx-auto">
         <h1 className="text-3xl font-bold mb-6">Profile Setup</h1>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
-          <Card>
-            <CardHeader>
-              <CardTitle>{formatSize(session?.user?.storageUsed ?? 0)} / 1GB</CardTitle>
-              <CardDescription>Storage Usage</CardDescription>
-            </CardHeader>
-            <CardFooter>
-              <progress
-                className="w-full h-2 bg-gray-200 rounded"
-                value={(session?.user?.storageUsed ?? 0) / 1073741824}
-                max={1}
-              ></progress>
-            </CardFooter>
-          </Card>
-        </div>
 
         <p className="text-muted-foreground mb-8">
           Complete your profile information to get the most out of KhmerCoders platform.
