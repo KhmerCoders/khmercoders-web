@@ -5,7 +5,7 @@ import { auth } from '@/utils/auth';
 import { eq } from 'drizzle-orm';
 import { headers } from 'next/headers';
 
-async function getSession() {
+export async function getSession() {
   const session = await auth.api.getSession({
     headers: await headers(),
   });

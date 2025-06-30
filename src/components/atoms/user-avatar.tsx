@@ -8,7 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../generated/dropdown-menu';
-import { User, Settings, ChartArea, Files } from 'lucide-react';
+import { User, Settings, ChartArea, Files, Newspaper } from 'lucide-react';
 import Link from 'next/link';
 import { useSession } from '../auth-provider';
 import { Badge } from '../generated/badge';
@@ -56,6 +56,19 @@ export function UserAvatar() {
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
+        {profile && (
+          <>
+            <DropdownMenuItem asChild>
+              <Link href={`/@${profile?.alias}/articles`} className="cursor-pointer">
+                <Newspaper className="mr-2 h-4 w-4" />
+                Articles
+                <div className="grow flex justify-end">
+                  <Badge>Beta</Badge>
+                </div>
+              </Link>
+            </DropdownMenuItem>
+          </>
+        )}
         <DropdownMenuItem asChild>
           <Link href={'/profile/storage'} className="cursor-pointer">
             <Files className="mr-2 h-4 w-4" />

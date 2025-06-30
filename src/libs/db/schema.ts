@@ -138,6 +138,25 @@ export const userUploadBinding = sqliteTable(
   ]
 );
 
+export const article = sqliteTable(
+  'article',
+  {
+    id: text('id').primaryKey().notNull(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    title: text('title').notNull(),
+    slug: text('slug').notNull().unique(),
+    image: text('image'),
+    summary: text('summary'),
+    content: text('content').notNull(),
+    published: integer('published', { mode: 'boolean' }).notNull().default(false),
+    createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
+    updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull(),
+  },
+  table => [index('article_user_id_idx').on(table.userId)]
+);
+
 // Relations
 export const userUploadRelationship = relations(userUpload, ({ one, many }) => ({
   bindings: many(userUploadBinding),
@@ -148,4 +167,12 @@ export const userUploadBindingRelationship = relations(userUploadBinding, ({ one
     fields: [userUploadBinding.userUploadId],
     references: [userUpload.id],
   }),
+}));
+
+export const userRelationship = relations(user, ({ one }) => ({
+  profile: one(memberProfile, { fields: [user.id], references: [memberProfile.userId] }),
+}));
+
+export const articleRelationship = relations(article, ({ one }) => ({
+  user: one(user, { fields: [article.userId], references: [user.id] }),
 }));

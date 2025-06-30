@@ -117,6 +117,19 @@ export async function syncUploadsToResource(
 
   const db = await getDB();
 
+  if (uploadIds.length === 0) {
+    await db
+      .delete(schema.userUploadBinding)
+      .where(
+        and(
+          eq(schema.userUploadBinding.resourceType, resourceType),
+          eq(schema.userUploadBinding.resourceId, resourceId)
+        )
+      );
+
+    return;
+  }
+
   // Validate if all upload IDs exist and belong to the user
   const uploadRecords = await db.query.userUpload.findMany({
     where: (userUpload, { inArray, and, eq }) =>

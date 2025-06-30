@@ -98,3 +98,64 @@
     --chart-5: oklch(0.645 0.246 16.439);
   }
 }
+
+.markdown h1 {
+  @apply text-3xl font-bold mb-4;
+}
+
+.markdown h2 {
+  @apply text-2xl font-bold mb-3;
+}
+
+.markdown h3 {
+  @apply text-xl font-bold mb-2;
+}
+
+.markdown h4 {
+  @apply text-lg font-bold mb-1;
+}
+
+.markdown h5 {
+  @apply text-base font-bold mb-1;
+}
+
+.markdown h6 {
+  @apply text-sm font-bold mb-1;
+}
+
+.markdown p {
+  @apply mb-4;
+}
+
+.markdown ul {
+  @apply list-disc list-inside mb-4;
+}
+
+.markdown li > ol,
+.markdown li > ul {
+  @apply ml-4 mt-2;
+}
+
+.markdown ol {
+  @apply list-decimal list-inside mb-4;
+}
+
+.markdown blockquote {
+  @apply border-l-4 pl-4 italic mb-4;
+}
+
+.markdown pre {
+  @apply bg-gray-100 dark:bg-gray-800 p-4 rounded mb-4 overflow-x-auto;
+}
+
+.markdown code {
+  @apply bg-gray-100 dark:bg-gray-800 p-1 rounded;
+}
+
+.markdown a {
+  @apply text-blue-600 dark:text-blue-400 underline;
+}
+
+.markdown img {
+  @apply max-w-full h-auto;
+}

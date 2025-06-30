@@ -2,13 +2,14 @@
 import { GithubIcon } from '@/components/atoms/icons';
 import { getDB } from '@/libs/db';
 import * as schema from '@/libs/db/schema';
-import { desc, eq } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import { UserLevelBadge } from '@/components/user-level-badge';
 import { ProfileTrackingComponent } from './tracker';
 import { sortExperience } from '@/utils/experience';
+import { getProfileFromUsernameCache } from '@/server/cache/user';
+import { ProfileHeader } from '@/components/profile-header';
 
 export async function generateMetadata({
   params,
@@ -16,30 +17,7 @@ export async function generateMetadata({
   params: Promise<{ username: string }>;
 }): Promise<Metadata> {
   const { username } = await params;
-
-  if (username.substring(0, 3) !== '%40') {
-    return {
-      title: 'Profile Not Found | Khmer Coders',
-      description: 'The requested profile could not be found.',
-    };
-  }
-
-  const normalizedUsername = username.substring(3).toLowerCase();
-  const db = await getDB();
-
-  const profile = await db
-    .select()
-    .from(schema.memberProfile)
-    .innerJoin(schema.user, eq(schema.memberProfile.userId, schema.user.id))
-    .where(eq(schema.memberProfile.alias, normalizedUsername))
-    .get();
-
-  if (!profile) {
-    return {
-      title: 'Profile Not Found | Khmer Coders',
-      description: 'The requested profile could not be found.',
-    };
-  }
+  const profile = await getProfileFromUsernameCache(username);
 
   return {
     title: `${profile.user.name} (${profile.member_profile.title}) | Khmer Coders`,
@@ -72,25 +50,9 @@ export default async function UserProfilePage({
   params: Promise<{ username: string }>;
 }) {
   const { username } = await params;
+  const profile = await getProfileFromUsernameCache(username);
 
-  if (username.substring(0, 3) !== '%40') {
-    return notFound();
-  }
-
-  const normalizedUsername = username.substring(3).toLowerCase();
   const db = await getDB();
-
-  const profile = await db
-    .select()
-    .from(schema.memberProfile)
-    .innerJoin(schema.user, eq(schema.memberProfile.userId, schema.user.id))
-    .where(eq(schema.memberProfile.alias, normalizedUsername))
-    .get();
-
-  if (!profile) {
-    return notFound();
-  } // Getting the experience
-
   const experiences = sortExperience(
     await db
       .select()
@@ -101,35 +63,9 @@ export default async function UserProfilePage({
   return (
     <>
       <ProfileTrackingComponent userId={profile.user.id} />
-      <div className="relative border-b border-gray-600">
-        <div className="absolute inset-0 z-0 bg-[linear-gradient(to_right,#f59e0b1a_1px,transparent_1px),linear-gradient(to_bottom,#f59e0b1a_1px,transparent_1px)] bg-[size:35px_34px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
-        <div className="container relative z-10 mx-auto py-4 px-4 flex gap-3">
-          <div
-            className="w-20 h-20 rounded-full border-2 border-orange-400 bg-orange-100 overflow-hidden"
-            style={
-              profile.user.image
-                ? {
-                    backgroundImage: `url(${profile.user.image})`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                  }
-                : {}
-            }
-          />
-          <div className="flex flex-col justify-center">
-            <div className="flex gap-2 items-center">
-              <h1 className="font-semibold text-lg">{profile.user.name}</h1>
-              <UserLevelBadge level={profile.user.level} />
-            </div>
-            <p className="text-gray-400 text-sm">{profile.member_profile.title}</p>
-            <p className="text-gray-400 text-sm font-mono">@{profile.member_profile.alias}</p>
-          </div>
-        </div>
 
-        <ul className="container relative z-10 mx-auto text-sm flex">
-          <li className="p-2 px-4 border-b-4 border-orange-500">Profile</li>
-        </ul>
-      </div>
+      <ProfileHeader user={profile.user} profile={profile.member_profile} />
+
       <div className="container mx-auto flex gap-4 my-4 mb-12">
         <div className="grow">
           <div className="my-4 flex gap-2 flex-wrap">
