@@ -3,6 +3,7 @@ import { z } from 'zod/v4';
 import { MainDatabase } from '@/types';
 import { eq, desc, and, isNull } from 'drizzle-orm';
 import { shortenedLinks } from '@/libs/db/schema';
+import { User } from 'better-auth/types';
 
 // IETF RFC 3986 Section 2.3:
 // "Characters that are allowed in a URI but do not have a reserved
@@ -10,6 +11,10 @@ import { shortenedLinks } from '@/libs/db/schema';
 // lowercase letters, decimal digits, hyphen, period, underscore, and tilde."
 export const VALID_SLUG_PATTERN = /^[a-zA-Z0-9-_]+$/;
 export const VALID_SLUG_MESSAGE = 'Slug can only contain letters, numbers, hyphens and underscores';
+
+export type QueryShortenedLinkOptions = {
+  includeDeleted?: boolean;
+};
 
 export const urlSchema = z.object({
   url: z.url({
@@ -34,11 +39,18 @@ export const urlSchema = z.object({
 
 export type ShortenedLinkInput = z.infer<typeof urlSchema>;
 
-export type CreateShortenedLinkInput = z.infer<typeof urlSchema>;
-
-export async function getShortenedLinkBySlug(db: MainDatabase, slug: string) {
+export async function getShortenedLinkBySlug(
+  db: MainDatabase,
+  slug: string,
+  options: QueryShortenedLinkOptions = {
+    includeDeleted: false,
+  }
+) {
   const result = await db.query.shortenedLinks.findFirst({
-    where: and(eq(shortenedLinks.slug, slug), isNull(shortenedLinks.deletedAt)),
+    where: and(
+      eq(shortenedLinks.slug, slug),
+      options.includeDeleted ? undefined : isNull(shortenedLinks.deletedAt)
+    ),
   });
   return result;
 }
@@ -55,45 +67,48 @@ export async function getShortenedLinkByIdAndUser(
   db: MainDatabase,
   id: string,
   userId: string,
-  includeDeleted = false
+  options: QueryShortenedLinkOptions = {
+    includeDeleted: false,
+  }
 ) {
   return await db.query.shortenedLinks.findFirst({
     where: and(
       eq(shortenedLinks.id, id),
       eq(shortenedLinks.userId, userId),
-      includeDeleted ? undefined : isNull(shortenedLinks.deletedAt)
+      options.includeDeleted ? undefined : isNull(shortenedLinks.deletedAt)
     ),
   });
 }
 
-type NewShortenedLink = CreateShortenedLinkInput & { userId: string };
+export type NewShortenedLink = ShortenedLinkInput & { userId: string };
 
 export async function createShortenedLink(
   db: MainDatabase,
-  input: NewShortenedLink,
-  env: { KV: KVNamespace }
+  input: ShortenedLinkInput,
+  ctx: { KV: KVNamespace; user: User }
 ) {
-  const { url, slug, userId } = input;
+  const { url, slug } = input;
+  const userId = ctx.user.id;
   const shortId = nanoid(10);
   const finalSlug = slug ?? shortId;
 
-  return await db.transaction(async tx => {
-    const [result] = await tx
-      .insert(shortenedLinks)
-      .values({
-        id: shortId,
-        originalUrl: url,
-        slug: finalSlug,
-        userId,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      })
-      .returning();
+  const [result] = await db
+    .insert(shortenedLinks)
+    .values({
+      id: shortId,
+      originalUrl: url,
+      slug: finalSlug,
+      userId,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    })
+    .returning();
 
-    await env.KV.put(finalSlug, url);
+  if (result) {
+    await ctx.KV.put(finalSlug, url);
+  }
 
-    return result;
-  });
+  return result;
 }
 
 /**
@@ -140,7 +155,6 @@ export async function deleteShortenedLink(db: MainDatabase, id: string, env: { K
     .returning();
 
   if (link) {
-    // Remove from KV store
     await env.KV.delete(link.slug);
   }
 

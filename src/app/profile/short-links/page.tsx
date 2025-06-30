@@ -68,7 +68,7 @@ function QRCodeDialog({
   onClose: () => void;
   slug: string;
 }) {
-  const absoluteUrl = new URL(slug, 'https://kcc.li').toString();
+  const absoluteUrl = new URL(slug, `https://${URL_PREFIX}`).toString();
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
@@ -442,7 +442,7 @@ export default function ShortenedLinksPage() {
                               }}
                             >
                               <BarChart2 className="mr-2 h-4 w-4" />
-                              View Insights
+                              Insights
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               className="cursor-pointer"

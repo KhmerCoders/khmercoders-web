@@ -8,7 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../generated/dropdown-menu';
-import { User, Settings, ChartArea, Files } from 'lucide-react';
+import { User, Settings, ChartArea, Files, LinkIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useSession } from '../auth-provider';
 import { Badge } from '../generated/badge';
@@ -63,6 +63,12 @@ export function UserAvatar() {
             <div className="grow flex justify-end">
               <Badge>Beta</Badge>
             </div>
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href={'/profile/short-links'} className="cursor-pointer">
+            <LinkIcon className="mr-2 h-4 w-4" />
+            Links Shortener
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />

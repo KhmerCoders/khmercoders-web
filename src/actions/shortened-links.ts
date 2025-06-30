@@ -33,7 +33,9 @@ export const createShortenedLinkAction = withAuthAction(
       const { slug } = validatedData.data;
 
       if (slug) {
-        const existingLink = await getShortenedLinkBySlug(db, slug);
+        const existingLink = await getShortenedLinkBySlug(db, slug, {
+          includeDeleted: true,
+        });
         if (existingLink) {
           return {
             success: false,
@@ -46,9 +48,8 @@ export const createShortenedLinkAction = withAuthAction(
         db,
         {
           ...validatedData.data,
-          userId: user.id,
         },
-        { KV: env.KV }
+        { KV: env.KV, user }
       );
 
       return {
