@@ -120,6 +120,16 @@ export const userUpload = sqliteTable(
   table => [index('user_upload_user_id_idx').on(table.userId)]
 );
 
+export const shortenedLinks = sqliteTable('shortened_links', {
+  id: text('id').primaryKey(),
+  originalUrl: text('original_url').notNull(),
+  slug: text('slug').notNull().unique(),
+  userId: text('user_id').notNull(),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
+  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull(),
+  deletedAt: integer('deleted_at', { mode: 'timestamp' }),
+});
+
 export const userUploadBinding = sqliteTable(
   'user_upload_binding',
   {

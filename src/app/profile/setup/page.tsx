@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ChevronRight, AtSign, User, Briefcase, Image } from 'lucide-react';
+import { ChevronRight, AtSign, User, Briefcase, Image, LinkIcon } from 'lucide-react';
 import { Card } from '@/components/generated/card';
 
 export default function ProfileSetupPage() {
