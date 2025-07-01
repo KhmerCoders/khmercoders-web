@@ -56,7 +56,7 @@ export function UserAvatar() {
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        {profile && user.level > 0 && (
+        {profile && user.level > 1 && (
           <>
             <DropdownMenuItem asChild>
               <Link href={`/profile/articles/create`} className="cursor-pointer">
