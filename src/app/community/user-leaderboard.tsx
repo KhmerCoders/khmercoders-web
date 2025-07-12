@@ -8,7 +8,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/generated/table';
+import { UserLevelBadge } from '@/components/user-level-badge';
 import { UserLeaderboard } from '@/libs/db/chatbot';
+import { UserRecordWithProfile } from '@/types';
 import { Send } from 'lucide-react';
 import Link from 'next/link';
 import * as React from 'react';
@@ -21,6 +23,17 @@ export function UserLeaderboardComponent({ data }: UserLeaderboardProps) {
   const sortedData = React.useMemo(() => {
     return [...data].sort((a, b) => b.message_count - a.message_count);
   }, [data]);
+
+  const userWithBadge = React.useCallback((user: UserRecordWithProfile) => {
+    return (
+      <>
+        <span>{user.name}</span>
+        <div className="mt-1.5">
+          <UserLevelBadge level={user?.level} />
+        </div>
+      </>
+    );
+  }, []);
 
   return (
     <div className="font-mono text-lg">
@@ -62,7 +75,7 @@ export function UserLeaderboardComponent({ data }: UserLeaderboardProps) {
                           <AvatarFallback />
                         )}
                       </Avatar>
-                      <span>{user.user.name}</span>
+                      {userWithBadge(user.user)}
                     </Link>
                   ) : (
                     <div className="flex gap-2 items-center">
@@ -73,7 +86,7 @@ export function UserLeaderboardComponent({ data }: UserLeaderboardProps) {
                           <AvatarFallback />
                         )}
                       </Avatar>
-                      <span>{user.user.name}</span>
+                      {userWithBadge(user.user)}
                     </div>
                   )
                 ) : (
