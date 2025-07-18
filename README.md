@@ -30,3 +30,7 @@ Start the development server
 ```bash
 npm run dev
 ```
+
+## Contributing
+
+We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for detailed information on how to contribute to this project.
