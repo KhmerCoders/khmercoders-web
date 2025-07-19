@@ -47,7 +47,7 @@ export function LikeButton({
           setLiked(!liked);
         });
     }
-  }, [liked]);
+  }, [liked, resourceId, resourceType]);
 
   return (
     <button className={className} disabled={!session || loading} onClick={handleToggleLike}>

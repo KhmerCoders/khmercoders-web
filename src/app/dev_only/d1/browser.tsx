@@ -88,7 +88,7 @@ export function D1Browser({ databaseName }: { databaseName: string }) {
       window.addEventListener('message', handler);
       return () => window.removeEventListener('message', handler);
     }
-  }, [iframeRef]);
+  }, [databaseName]);
 
   return (
     <iframe

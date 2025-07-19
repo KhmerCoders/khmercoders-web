@@ -1,11 +1,5 @@
+'use client';
 import { Button } from '@/components/generated/button';
-import { Input } from '@/components/generated/input';
-import { Label } from '@/components/generated/label';
-import { Textarea } from '@/components/generated/textarea';
-import { MarkdownEditor } from '@/components/markdown-editor';
-import { useUserUpload } from '@/components/user-upload/context';
-import { produce } from 'immer';
-import { Dispatch, SetStateAction, useCallback } from 'react';
 
 export interface ArticleEditorValue {
   title: string;
@@ -17,14 +11,29 @@ export interface ArticleEditorValue {
 
 interface ArticleEditorProps {
   value: ArticleEditorValue;
-  onChange: Dispatch<SetStateAction<ArticleEditorValue>>;
+  onChange: React.Dispatch<React.SetStateAction<ArticleEditorValue>>;
 }
+import { Input } from '@/components/generated/input';
+import { Label } from '@/components/generated/label';
+import { Textarea } from '@/components/generated/textarea';
+import dynamic from 'next/dynamic';
+
+const SimpleEditor = dynamic(
+  () => import('@/components/tiptap-templates/simple/simple-editor').then(mod => mod.SimpleEditor),
+  { ssr: false }
+);
+import { useUserUpload } from '@/components/user-upload/context';
+
+import { produce } from 'immer';
+import { useCallback, useState } from 'react';
 
 export function ArticleEditor({ value, onChange }: ArticleEditorProps) {
+  const [showPreview, setShowPreview] = useState(false);
+
   const handleTitleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      onChange(prev =>
-        produce(prev, draft => {
+      onChange((prev: ArticleEditorValue) =>
+        produce(prev, (draft: ArticleEditorValue) => {
           draft.title = e.target.value;
         })
       );
@@ -34,8 +43,8 @@ export function ArticleEditor({ value, onChange }: ArticleEditorProps) {
 
   const handleSlugChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      onChange(prev =>
-        produce(prev, draft => {
+      onChange((prev: ArticleEditorValue) =>
+        produce(prev, (draft: ArticleEditorValue) => {
           draft.slug = e.target.value;
         })
       );
@@ -45,8 +54,8 @@ export function ArticleEditor({ value, onChange }: ArticleEditorProps) {
 
   const handleSummaryChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-      onChange(prev =>
-        produce(prev, draft => {
+      onChange((prev: ArticleEditorValue) =>
+        produce(prev, (draft: ArticleEditorValue) => {
           draft.summary = e.target.value;
         })
       );
@@ -56,8 +65,8 @@ export function ArticleEditor({ value, onChange }: ArticleEditorProps) {
 
   const handleContentChange = useCallback(
     (newContent: string) => {
-      onChange(prev =>
-        produce(prev, draft => {
+      onChange((prev: ArticleEditorValue) =>
+        produce(prev, (draft: ArticleEditorValue) => {
           draft.content = newContent;
         })
       );
@@ -67,8 +76,8 @@ export function ArticleEditor({ value, onChange }: ArticleEditorProps) {
 
   const handleImageChange = useCallback(
     (newImage: string) => {
-      onChange(prev =>
-        produce(prev, draft => {
+      onChange((prev: ArticleEditorValue) =>
+        produce(prev, (draft: ArticleEditorValue) => {
           draft.image = newImage;
         })
       );
@@ -81,12 +90,13 @@ export function ArticleEditor({ value, onChange }: ArticleEditorProps) {
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-2">
           <Label>Title</Label>
-          <Input placeholder="Title" value={value.title} onChange={handleTitleChange} />
+          <Input type="text" placeholder="Title" value={value.title} onChange={handleTitleChange} />
         </div>
 
         <div className="flex flex-col gap-2">
           <Label>Slug (Optional)</Label>
           <Input
+            type="text"
             placeholder="eg: hello-world-article"
             value={value.slug}
             onChange={handleSlugChange}
@@ -99,12 +109,40 @@ export function ArticleEditor({ value, onChange }: ArticleEditorProps) {
         </div>
 
         <ArticleEditorImageInput value={value.image} onChange={handleImageChange} />
-        <MarkdownEditor value={value.content} onChange={handleContentChange} />
+
+        <div className="flex flex-row gap-2 items-center">
+          <Button variant="default" onClick={() => setShowPreview(true)}>
+            Edit & Preview Article
+          </Button>
+        </div>
       </div>
+
+      {showPreview && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-80"
+          style={{ animation: 'fadeIn 0.2s' }}
+        >
+          <div className="relative w-full h-full flex flex-col">
+            <Button
+              className="absolute top-0 left-4 z-50"
+              variant="secondary"
+              onClick={() => setShowPreview(false)}
+            >
+              Exit Preview
+            </Button>
+            <div className="flex-1 min-h-0 min-w-0 bg-white dark:bg-black rounded shadow-lg overflow-auto">
+              <SimpleEditor
+                content={value.content}
+                onChange={handleContentChange}
+                readOnly={false}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
-
 function ArticleEditorImageInput({
   onChange,
   value,
@@ -113,16 +151,17 @@ function ArticleEditorImageInput({
   onChange: (value: string) => void;
 }) {
   const { openUserUpload } = useUserUpload();
-  const handleUpload = useCallback(
-    (type: 'upload' | 'file') => {
-      openUserUpload(type).then(result => {
-        if (result && onChange) {
-          onChange(result);
-        }
-      });
-    },
-    [onChange, openUserUpload]
-  );
+
+  const handleUpload = useCallback(async () => {
+    try {
+      const url = await openUserUpload('upload');
+      if (url) {
+        onChange(url);
+      }
+    } catch (err) {
+      alert('Image upload failed: ' + (err as Error).message);
+    }
+  }, [onChange, openUserUpload]);
 
   if (value) {
     return (
@@ -138,7 +177,7 @@ function ArticleEditorImageInput({
         <Button
           className="absolute bottom-2 right-2 shadow-md"
           variant={'default'}
-          onClick={() => handleUpload('upload')}
+          onClick={handleUpload}
         >
           Change Image
         </Button>
@@ -148,17 +187,10 @@ function ArticleEditorImageInput({
 
   return (
     <div className="border h-64 rounded items-center justify-center flex flex-col gap-2">
-      <div className="text-gray-500 text-sm">
-        Upload your image or browse existing uploaded file
-      </div>
-      <div className="flex gap-2">
-        <Button variant={'secondary'} onClick={() => handleUpload('upload')}>
-          Upload
-        </Button>
-        <Button variant={'secondary'} onClick={() => handleUpload('file')}>
-          Browse Your Storage
-        </Button>
-      </div>
+      <div className="text-gray-500 text-sm">Upload your image</div>
+      <Button variant={'secondary'} onClick={handleUpload}>
+        Upload
+      </Button>
     </div>
   );
 }

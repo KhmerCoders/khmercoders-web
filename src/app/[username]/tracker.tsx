@@ -18,7 +18,7 @@ export function ProfileTrackingComponent({
         .then()
         .catch();
     }
-  }, [userId]);
+  }, [userId, eventType, articleId]);
 
   return null;
 }

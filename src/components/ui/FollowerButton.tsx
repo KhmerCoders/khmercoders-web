@@ -27,7 +27,7 @@ export function FollowButton({ defaultFollowed, targetUserId }: FollowButtonProp
       .finally(() => {
         setLoading(false);
       });
-  }, [followed, loading, targetUserId]);
+  }, [followed, targetUserId]);
 
   if (!session || session.user.id === targetUserId) {
     return null; // or render a login prompt

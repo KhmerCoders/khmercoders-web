@@ -39,7 +39,7 @@ export function ArticleEditClientPage({ data }: ArticleEditClientPageProps) {
       data.summary !== value.summary ||
       data.content !== value.content;
     hasUnsavedChangesRef.current = hasChanges;
-  }, [value]);
+  }, [value, data.title, data.slug, data.image, data.summary, data.content]);
 
   const navGuard = useNavigationGuard({
     enabled: hasUnsavedChangesRef.current && !submitting,

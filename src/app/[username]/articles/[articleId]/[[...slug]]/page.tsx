@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { bindingArticleLikeStatus } from '@/server/services/article';
 import { CommentButton, LikeButton } from '@/components/interaction-button';
 import { getSession } from '@/app/session';
-import { MarkdownContent } from '@/components/MarkdownContent';
+import { TipTapContent } from '@/components/TipTapContent';
 import { CommentWidget } from '@/components/blocks/post/CommentWidget';
 import { FollowButton } from '@/components/ui/FollowerButton';
 import { bindingFollowerStatusFromUser } from '@/server/services/followers';
@@ -86,7 +86,7 @@ export default async function EditArticlePage({ params }: EditArticlePageProps) 
           articleId={article.id}
         />
 
-        <main className="markdown p-4">
+        <main className="p-4">
           {article.image && (
             <Image
               width={128}
@@ -97,7 +97,7 @@ export default async function EditArticlePage({ params }: EditArticlePageProps) 
             />
           )}
 
-          <MarkdownContent>{article.content}</MarkdownContent>
+          <TipTapContent>{article.content}</TipTapContent>
         </main>
       </article>
       <div className="mx-auto max-w-4xl my-4">

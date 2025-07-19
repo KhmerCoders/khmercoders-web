@@ -1,4 +1,6 @@
 import '@/app/globals.css';
+import '../styles/_variables.scss';
+import '../styles/_keyframe-animations.scss';
 import { Header } from '@/components/atoms/header';
 import { KhmerCoderDevtool } from '@/components/devtool';
 import { ReactQueryProvider } from '@/components/react-query-prodiver';
@@ -25,12 +27,6 @@ export default function RootLayout({
         <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png" />
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png" />
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Kantumruy+Pro:ital,wght@0,100..700;1,100..700&family=VT323&display=swap"
-          rel="stylesheet"
-        />
         <title>{metadata.title}</title>
       </head>
       <body>

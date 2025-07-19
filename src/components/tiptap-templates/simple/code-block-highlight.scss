@@ -1,0 +1,146 @@
+/* Syntax highlighting styles for code blocks */
+.ProseMirror .hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 0;
+  background: transparent;
+}
+
+.ProseMirror .hljs-comment,
+.ProseMirror .hljs-quote {
+  color: #6a737d;
+  font-style: italic;
+}
+
+.ProseMirror .hljs-keyword,
+.ProseMirror .hljs-selector-tag,
+.ProseMirror .hljs-subst {
+  color: #d73a49;
+  font-weight: bold;
+}
+
+.ProseMirror .hljs-number,
+.ProseMirror .hljs-literal,
+.ProseMirror .hljs-variable,
+.ProseMirror .hljs-template-variable,
+.ProseMirror .hljs-tag .hljs-attr {
+  color: #005cc5;
+}
+
+.ProseMirror .hljs-string,
+.ProseMirror .hljs-doctag {
+  color: #032f62;
+}
+
+.ProseMirror .hljs-title,
+.ProseMirror .hljs-section,
+.ProseMirror .hljs-selector-id {
+  color: #6f42c1;
+  font-weight: bold;
+}
+
+.ProseMirror .hljs-subst {
+  font-weight: normal;
+}
+
+.ProseMirror .hljs-type,
+.ProseMirror .hljs-class .hljs-title,
+.ProseMirror .hljs-tag,
+.ProseMirror .hljs-name,
+.ProseMirror .hljs-attribute {
+  color: #22863a;
+  font-weight: normal;
+}
+
+.ProseMirror .hljs-regexp,
+.ProseMirror .hljs-link {
+  color: #e36209;
+}
+
+.ProseMirror .hljs-symbol,
+.ProseMirror .hljs-bullet {
+  color: #005cc5;
+}
+
+.ProseMirror .hljs-built_in,
+.ProseMirror .hljs-builtin-name {
+  color: #e36209;
+}
+
+.ProseMirror .hljs-meta {
+  color: #6a737d;
+}
+
+.ProseMirror .hljs-deletion {
+  background: #ffeef0;
+}
+
+.ProseMirror .hljs-addition {
+  background: #f0fff4;
+}
+
+.ProseMirror .hljs-emphasis {
+  font-style: italic;
+}
+
+.ProseMirror .hljs-strong {
+  font-weight: bold;
+}
+
+/* Dark theme styles */
+.dark .ProseMirror .hljs-comment,
+.dark .ProseMirror .hljs-quote {
+  color: #6a737d;
+}
+
+.dark .ProseMirror .hljs-keyword,
+.dark .ProseMirror .hljs-selector-tag,
+.dark .ProseMirror .hljs-subst {
+  color: #f97583;
+}
+
+.dark .ProseMirror .hljs-number,
+.dark .ProseMirror .hljs-literal,
+.dark .ProseMirror .hljs-variable,
+.dark .ProseMirror .hljs-template-variable,
+.dark .ProseMirror .hljs-tag .hljs-attr {
+  color: #79b8ff;
+}
+
+.dark .ProseMirror .hljs-string,
+.dark .ProseMirror .hljs-doctag {
+  color: #9ecbff;
+}
+
+.dark .ProseMirror .hljs-title,
+.dark .ProseMirror .hljs-section,
+.dark .ProseMirror .hljs-selector-id {
+  color: #b392f0;
+}
+
+.dark .ProseMirror .hljs-type,
+.dark .ProseMirror .hljs-class .hljs-title,
+.dark .ProseMirror .hljs-tag,
+.dark .ProseMirror .hljs-name,
+.dark .ProseMirror .hljs-attribute {
+  color: #85e89d;
+}
+
+.dark .ProseMirror .hljs-regexp,
+.dark .ProseMirror .hljs-link {
+  color: #ffab70;
+}
+
+.dark .ProseMirror .hljs-symbol,
+.dark .ProseMirror .hljs-bullet {
+  color: #79b8ff;
+}
+
+.dark .ProseMirror .hljs-built_in,
+.dark .ProseMirror .hljs-builtin-name {
+  color: #ffab70;
+}
+
+.dark .ProseMirror .hljs-meta {
+  color: #6a737d;
+}
