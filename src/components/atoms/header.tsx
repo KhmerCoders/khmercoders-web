@@ -10,7 +10,7 @@ export function Header() {
   const isHomePage = pathname === '/';
 
   return (
-    <header className="bg-white dark:bg-black py-1 px-4 xl:px-16 flex items-center gap-12 mb-8 justify-between bg-background border-b shadow-[0_2px_8px_-1px_rgba(251,146,60,0.4)]">
+    <header className="bg-white dark:bg-black py-1 px-4 xl:px-16 flex items-center gap-2 lg:gap-12 mb-8 justify-between bg-background border-b shadow-[0_2px_8px_-1px_rgba(251,146,60,0.4)]">
       <Link href="/" className="flex items-center z-9999">
         <div className="w-14 h-14 flex items-center justify-center">
           <Image

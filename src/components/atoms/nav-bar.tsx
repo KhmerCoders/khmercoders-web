@@ -30,7 +30,7 @@ export const Navbar = () => {
 
   return (
     <div className="flex items-center flex-row">
-      <div className="flex gap-4 items-center sm:hidden">
+      <div className="flex gap-2 sm:gap-4 items-center md:hidden">
         <UserAvatar />
         <NavbarContainer className="items-center flex-row" aria-label="Mobile Navigation">
           <Sheet>
@@ -111,8 +111,8 @@ export const Navbar = () => {
           </Sheet>
         </NavbarContainer>
       </div>
-      <div className="hidden sm:flex gap-4 items-center">
-        <NavbarContainer aria-label="Main Navigation">
+      <div className="hidden md:flex gap-4 items-center">
+        <NavbarContainer isDesktop aria-label="Main Navigation">
           <NavbarLink href="/events" isHighlighted={isActiveLink('/events')}>
             Events
           </NavbarLink>
@@ -138,9 +138,19 @@ export const Navbar = () => {
 
 export default Navbar;
 
-export const NavbarContainer = ({ children, className, ...props }: ComponentProps<'nav'>) => {
+export const NavbarContainer = ({
+  children,
+  className,
+  isDesktop,
+  ...props
+}: ComponentProps<'nav'> & { isDesktop?: boolean }) => {
   return (
-    <nav className={cn('flex w-fit', className)} {...props}>
+    <nav
+      className={cn('flex w-fit', className, {
+        'md:[&_a]:text-[0.8125rem] md:[&_a]:sm:w-20 lg:[&_a]:text-sm lg:[&_a]:sm:w-28': isDesktop,
+      })}
+      {...props}
+    >
       <ul className="flex w-fit items-center justify-between">{children}</ul>
     </nav>
   );
