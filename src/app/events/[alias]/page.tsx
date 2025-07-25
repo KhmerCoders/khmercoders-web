@@ -21,7 +21,8 @@ export async function generateMetadata({
 }: {
   params: { alias: string };
 }): Promise<Metadata> {
-  const event = eventsDatabase.find(event => event.id === params.alias);
+  const awaitedParams = await params;
+  const event = eventsDatabase.find(event => event.id === awaitedParams.alias);
 
   if (!event) {
     return {
@@ -48,7 +49,9 @@ export async function generateMetadata({
   };
 }
 
-export default function EventDetailPage({ params: { alias } }: { params: { alias: string } }) {
+export default async function EventDetailPage({ params }: { params: { alias: string } }) {
+  const awaitedParams = await params;
+  const { alias } = awaitedParams;
   const event = eventsDatabase.find(event => event.id === alias);
 
   if (!event) {
