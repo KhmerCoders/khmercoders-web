@@ -35,31 +35,18 @@ export const createArticleAction = withAuthAction(
 
       await syncResource(db, user.id, data, id);
 
-      await db.batch([
-        db.insert(schema.article).values({
-          id,
-          userId: user.id,
-          title: data.title,
-          slug: data.slug,
-          image: data.image,
-          summary: data.summary,
-          content: data.content,
-          published: false,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        }),
-        // Create a post entry to integrate with the unified feed system
-        // This allows articles to appear in feeds alongside other content types
-        db.insert(schema.posts).values({
-          content: data.content,
-          postType: PostType.ArticlePost,
-          linkingResourceId: id,
-          userId: user.id,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          id,
-        }),
-      ]);
+      await db.insert(schema.article).values({
+        id,
+        userId: user.id,
+        title: data.title,
+        slug: data.slug,
+        image: data.image,
+        summary: data.summary,
+        content: data.content,
+        published: false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
 
       article = await db.query.article.findFirst({
         where: (article, { eq }) => eq(article.id, id),
@@ -155,6 +142,21 @@ export const updateArticlePublishAction = withAuthAction(
         updatedAt: new Date(),
       })
       .where(eq(schema.article.id, id));
+
+    if (publish) {
+      await db
+        .insert(schema.posts)
+        .values({
+          content: '',
+          postType: PostType.ArticlePost,
+          linkingResourceId: id,
+          userId: user.id,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          id,
+        })
+        .onConflictDoNothing();
+    }
 
     // Using AI to check if article meet standard before showing in public
     // const { ctx } = getCloudflareContext();

@@ -1,5 +1,5 @@
 import { UserLevel, BindingResourceType, LikableResourceType, PostType } from '@/types';
-import { like, relations } from 'drizzle-orm';
+import { relations } from 'drizzle-orm';
 import { sqliteTable, text, integer, index, primaryKey } from 'drizzle-orm/sqlite-core';
 
 export const user = sqliteTable('user', {

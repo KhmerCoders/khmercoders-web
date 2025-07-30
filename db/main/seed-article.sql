@@ -3083,3 +3083,6 @@ Good reviews make better code! ✅',
     1734472422,
     1734472422
   );
+
+INSERT INTO posts(id, user_id, content, like_count, comment_count, resource_type, resource_id, created_at, updated_at)
+SELECT id, user_id, content, like_count, comment_count, 'article_post', id, created_at, updated_at FROM article;
