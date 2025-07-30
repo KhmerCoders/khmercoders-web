@@ -9,6 +9,7 @@ import { DrizzleD1Database } from 'drizzle-orm/d1';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { getDB } from '@/libs/db';
 import { generateArticleId } from '../generate-id';
+import { PostType } from '@/types';
 
 export const createArticleAction = withAuthAction(
   async ({ db, user }, data: ArticleEditorValue) => {
@@ -34,18 +35,31 @@ export const createArticleAction = withAuthAction(
 
       await syncResource(db, user.id, data, id);
 
-      await db.insert(schema.article).values({
-        id,
-        userId: user.id,
-        title: data.title,
-        slug: data.slug,
-        image: data.image,
-        summary: data.summary,
-        content: data.content,
-        published: false,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
+      await db.batch([
+        db.insert(schema.article).values({
+          id,
+          userId: user.id,
+          title: data.title,
+          slug: data.slug,
+          image: data.image,
+          summary: data.summary,
+          content: data.content,
+          published: false,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        }),
+        // Create a post entry to integrate with the unified feed system
+        // This allows articles to appear in feeds alongside other content types
+        db.insert(schema.posts).values({
+          content: data.content,
+          postType: PostType.ArticlePost,
+          linkingResourceId: id,
+          userId: user.id,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          id,
+        }),
+      ]);
 
       article = await db.query.article.findFirst({
         where: (article, { eq }) => eq(article.id, id),

@@ -1,7 +1,7 @@
 'use client';
 import { Button } from '@/components/generated/button';
 import { createPostAction } from '@/server/actions/post';
-import { PostableResourceType, PostRecordWithProfile } from '@/types';
+import { PostType, PostRecordWithProfile } from '@/types';
 import { cn } from '@/utils';
 import { useMutation } from '@tanstack/react-query';
 import { useState, useRef, useEffect } from 'react';
@@ -11,7 +11,7 @@ export function CommentEditor({
   resourceType,
   onSuccess,
 }: {
-  resourceType: PostableResourceType;
+  resourceType: PostType;
   resourceId: string | null;
   onSuccess: (post: PostRecordWithProfile) => void;
 }) {
@@ -37,7 +37,7 @@ export function CommentEditor({
     mutationFn: async (newPost: {
       content: string;
       resourceId: string | null;
-      resourceType: PostableResourceType;
+      resourceType: PostType;
     }) => {
       const response = await createPostAction(resourceType, resourceId, newPost.content);
       if (!response.success) {

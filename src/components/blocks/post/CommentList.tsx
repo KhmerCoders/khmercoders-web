@@ -1,14 +1,14 @@
 'use client';
 
 import { useSession } from '@/components/auth-provider';
-import { FeedRecord, PostableResourceType, PostRecordWithProfile } from '@/types';
+import { FeedRecord, PostType, PostRecordWithProfile } from '@/types';
 import { useState } from 'react';
 import { CommentEditor } from './CommentEditor';
 import { FeedList } from './FeedList';
 
 interface PostListProps {
   posts: FeedRecord[];
-  resourceType: PostableResourceType;
+  resourceType: PostType;
   resourceId: string | null;
 }
 
