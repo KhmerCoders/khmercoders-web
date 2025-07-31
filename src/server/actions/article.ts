@@ -9,6 +9,7 @@ import { DrizzleD1Database } from 'drizzle-orm/d1';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { getDB } from '@/libs/db';
 import { generateArticleId } from '../generate-id';
+import { PostType } from '@/types';
 
 export const createArticleAction = withAuthAction(
   async ({ db, user }, data: ArticleEditorValue) => {
@@ -141,6 +142,21 @@ export const updateArticlePublishAction = withAuthAction(
         updatedAt: new Date(),
       })
       .where(eq(schema.article.id, id));
+
+    if (publish) {
+      await db
+        .insert(schema.posts)
+        .values({
+          content: '',
+          postType: PostType.ArticlePost,
+          linkingResourceId: id,
+          userId: user.id,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          id,
+        })
+        .onConflictDoNothing();
+    }
 
     // Using AI to check if article meet standard before showing in public
     // const { ctx } = getCloudflareContext();

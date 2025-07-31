@@ -1,10 +1,10 @@
 'use server';
-import { PostableResourceType } from '@/types';
+import { PostType } from '@/types';
 import { CommentList } from './CommentList';
 import { getFeedFromArticle } from '@/server/services/feed';
 
 interface CommentWidgetProps {
-  resourceType: PostableResourceType;
+  resourceType: PostType;
   resourceId: string;
   userId?: string;
 }

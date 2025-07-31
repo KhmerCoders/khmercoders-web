@@ -1,6 +1,6 @@
 import { getDB } from '@/libs/db';
 import { bindingArticleListLikeStatus } from './article';
-import { FeedRecord } from '@/types';
+import { FeedRecord, PostType } from '@/types';
 import { bindingLikeStatus } from './likes';
 
 export interface FeedFilterOptions {
@@ -64,8 +64,10 @@ export async function getFeedFromArticle(articleId: string, userId?: string) {
     (
       await db.query.posts.findMany({
         where: (posts, { eq, isNull }) =>
-          eq(posts.resourceType, 'article') &&
-          (articleId == null ? isNull(posts.resourceId) : eq(posts.resourceId, articleId)),
+          eq(posts.postType, PostType.ArticleComment) &&
+          (articleId == null
+            ? isNull(posts.linkingResourceId)
+            : eq(posts.linkingResourceId, articleId)),
         orderBy: (posts, { desc }) => desc(posts.createdAt),
         with: {
           user: {

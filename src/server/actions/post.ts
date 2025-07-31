@@ -1,6 +1,6 @@
 'use server';
 
-import { PostableResourceType, PostRecord, PostRecordWithProfile } from '@/types';
+import { PostType, PostRecord, PostRecordWithProfile } from '@/types';
 import { withAuthAction } from './middleware';
 import * as schema from './../../libs/db/schema';
 import { generatePostId } from '../generate-id';
@@ -11,8 +11,8 @@ const POST_CHARACTER_LIMIT = 300; // Define a character limit for posts
 export const createPostAction = withAuthAction(
   async (
     { db, user },
-    resourceType: PostableResourceType,
-    resourceId: string | null,
+    postType: PostType,
+    linkingResourceId: string | null,
     content: string
   ): Promise<{ success: boolean; result?: PostRecordWithProfile; error?: string }> => {
     if (!content || content.trim() === '') {
@@ -31,11 +31,11 @@ export const createPostAction = withAuthAction(
 
     let increaseCommentOperation;
 
-    // Validate based on resource type
-    if (resourceType === 'article' && resourceId) {
+    // Validate based on post type
+    if (postType === PostType.ArticlePost && linkingResourceId) {
       // Check if the article exists
       const resource = await db.query.article.findFirst({
-        where: (article, { eq }) => eq(article.id, resourceId),
+        where: (article, { eq }) => eq(article.id, linkingResourceId),
       });
 
       if (!resource) {
@@ -50,11 +50,11 @@ export const createPostAction = withAuthAction(
         .set({
           commentCount: sql`${schema.article.commentCount} + 1`,
         })
-        .where(eq(schema.article.id, resourceId));
+        .where(eq(schema.article.id, linkingResourceId));
     } else {
       return {
         success: false,
-        error: 'Invalid resource type',
+        error: 'Invalid post type',
       };
     }
 
@@ -63,8 +63,8 @@ export const createPostAction = withAuthAction(
     await db.batch([
       db.insert(schema.posts).values({
         content,
-        resourceType,
-        resourceId,
+        postType,
+        linkingResourceId,
         userId: user.id,
         createdAt: new Date(),
         updatedAt: new Date(),

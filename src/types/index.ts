@@ -68,7 +68,12 @@ export enum UserLevel {
 
 export type BindingResourceType = 'profile' | 'article';
 export type LikableResourceType = 'article' | 'post';
-export type PostableResourceType = 'article' | 'post';
+
+export enum PostType {
+  Post = 'post', // Commenting on a post
+  ArticleComment = 'article', // Commenting on the article
+  ArticlePost = 'article_post', // Post that mention article has been posted
+}
 
 export type MainDatabase = DrizzleD1Database<typeof schema>;
 
