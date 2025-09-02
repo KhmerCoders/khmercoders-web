@@ -206,7 +206,19 @@ function groupExpByKey<T, K extends keyof T, I extends string>(
       } as GroupedEXP<T, K, I>);
     });
 
-    // final sorting based on KeyForSort
+    // sorting [itemsKey]'s items
+    result.forEach(res => {
+      return (
+        res[itemsKey].length > 1 &&
+        res[itemsKey].sort((a, b) => {
+          const startA = new Date(a[groupWithGap.keyForSort as keyof typeof a] as any).getTime();
+          const startB = new Date(b[groupWithGap.keyForSort as keyof typeof b] as any).getTime();
+          return groupWithGap.sort === 'ASC' ? startA - startB : startB - startA;
+        })
+      );
+    });
+
+    // sorting [groupByKey]'s items
     return result.sort((a, b) => {
       const startA = new Date((a[itemsKey] as any)[0][groupWithGap.keyForSort] as any).getTime();
       const startB = new Date((b[itemsKey] as any)[0][groupWithGap.keyForSort] as any).getTime();
