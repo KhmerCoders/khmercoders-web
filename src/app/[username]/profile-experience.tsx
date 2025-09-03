@@ -10,13 +10,7 @@ export function ProfileExperienceListWithReview({
   experiences: ExperienceRecord[];
 }) {
   const { feedback } = useProfileAiReview();
-
-  const disloyalExp: GroupedEXPWithGap<ExperienceRecord> = {
-    keyForSort: 'startYear',
-    keyForCheck: 'endYear',
-    sort: 'DESC',
-  };
-  const groupedExp = groupExpByKey(experiences, 'companyName', 'items', disloyalExp);
+  const groupedExp = groupExperiences(experiences);
 
   return (
     <>
@@ -60,7 +54,7 @@ export function ProfileExperienceListWithReview({
                   return (
                     <div key={index}>
                       <h3 className="text-sm font-semibold">{exp.role}</h3>{' '}
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm text-muted-foreground text-balance">
                         <span className="text-orange-400">{company.companyName}</span> (
                         {exp.startYear}&nbsp;-&nbsp;{exp.endYear ? exp.endYear : 'Present'})
                       </p>
@@ -79,13 +73,10 @@ export function ProfileExperienceListWithReview({
                     {/* company name & date range */}
                     <div>
                       <h3 className=" text-orange-400">{company.companyName}</h3>{' '}
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm text-muted-foreground text-balance">
                         <span>
-                          Working range: {Math.min(...company.items.map(exp => exp.startYear))}
-                          &nbsp;-&nbsp;
-                          {company.items.map(exp => exp.endYear).includes(null)
-                            ? 'Present'
-                            : Math.max(...company.items.map(exp => exp.endYear ?? 0))}
+                          Working range: {company.startYear}&nbsp;-&nbsp;
+                          {company.endYear ?? 'Present'}
                         </span>{' '}
                       </p>
                     </div>
@@ -139,107 +130,62 @@ const AIFeedBack = ({ feedback }: { feedback: ProfileAiReviewFeedback['experienc
   );
 };
 
-type GroupedEXP<T, K extends keyof T, I extends string> = {
-  [P in K]: T[P];
-} & {
-  [P in I]: Array<Omit<T, K>>;
-};
-
-type GroupedEXPWithGap<T> =
-  | false
-  | { keyForSort: keyof T; keyForCheck: keyof T; sort: 'ASC' | 'DESC' };
-
-function groupExpByKey<T, K extends keyof T, I extends string>(
-  data: T[],
-  groupByKey: K,
-  itemsKey: I,
-  groupWithGap: GroupedEXPWithGap<T> = false
-): Array<GroupedEXP<T, K, I>> {
-  if (groupWithGap !== false && groupWithGap) {
-    const groupedMap = data.reduce((acc, currentItem) => {
-      const groupValue = currentItem[groupByKey];
-      const { [groupByKey]: _, ...itemWithoutGroupKey } = currentItem;
-
-      if (!acc.has(groupValue)) {
-        acc.set(groupValue, []);
-      }
-      // Store both (original item and item without group key) for later use
-      acc.get(groupValue)!.push({
-        original: currentItem,
-        omitted: itemWithoutGroupKey,
-      });
-      return acc;
-    }, new Map<T[K], Array<{ original: T; omitted: Omit<T, K> }>>());
-
-    const result: Array<GroupedEXP<T, K, I>> = [];
-
-    groupedMap.forEach((items, groupValue) => {
-      // sort exp to see gaps
-      items.sort(
-        (a, b) =>
-          new Date(a.original[groupWithGap.keyForSort] as any).getTime() -
-          new Date(b.original[groupWithGap.keyForSort] as any).getTime()
-      );
-
-      let currentGroup: Omit<T, K>[] = [];
-      let lastEndDate: Date | null = null;
-
-      items.forEach(item => {
-        const currentStartDate = new Date(item.original[groupWithGap.keyForSort] as any);
-
-        if (lastEndDate && currentStartDate.getTime() > lastEndDate.getTime()) {
-          // if found a gap, push current group and start new one
-          result.push({
-            [groupByKey]: groupValue,
-            [itemsKey]: currentGroup,
-          } as GroupedEXP<T, K, I>);
-          currentGroup = [];
-        }
-
-        currentGroup.push(item.omitted);
-        lastEndDate = new Date(item.original[groupWithGap.keyForCheck] as any);
-      });
-
-      result.push({
-        [groupByKey]: groupValue,
-        [itemsKey]: currentGroup,
-      } as GroupedEXP<T, K, I>);
-    });
-
-    // sorting [itemsKey]'s items
-    result.forEach(res => {
-      return (
-        res[itemsKey].length > 1 &&
-        res[itemsKey].sort((a, b) => {
-          const startA = new Date(a[groupWithGap.keyForSort as keyof typeof a] as any).getTime();
-          const startB = new Date(b[groupWithGap.keyForSort as keyof typeof b] as any).getTime();
-          return groupWithGap.sort === 'ASC' ? startA - startB : startB - startA;
-        })
-      );
-    });
-
-    // sorting [groupByKey]'s items
-    return result.sort((a, b) => {
-      const startA = new Date((a[itemsKey] as any)[0][groupWithGap.keyForSort] as any).getTime();
-      const startB = new Date((b[itemsKey] as any)[0][groupWithGap.keyForSort] as any).getTime();
-
-      return groupWithGap.sort === 'ASC' ? startA - startB : startB - startA;
-    });
-  } else {
-    // simple grouping with sorting order of original data
-    const groupedMap = data.reduce((acc, currentItem) => {
-      const groupValue = currentItem[groupByKey];
-      const { [groupByKey]: _, ...itemWithoutGroupKey } = currentItem;
-      if (!acc.has(groupValue)) {
-        acc.set(groupValue, {
-          [groupByKey]: groupValue,
-          [itemsKey]: [],
-        } as GroupedEXP<T, K, I>);
-      }
-      acc.get(groupValue)![itemsKey].push(itemWithoutGroupKey);
-      return acc;
-    }, new Map<T[K], GroupedEXP<T, K, I>>());
-
-    return Array.from(groupedMap.values()) as Array<GroupedEXP<T, K, I>>;
+interface ExperienceRecordGroup {
+  companyName: ExperienceRecord['companyName'];
+  companyLogo: ExperienceRecord['companyLogo'];
+  startYear: ExperienceRecord['startYear'];
+  endYear: ExperienceRecord['endYear'];
+  items: ExperienceRecord[];
+}
+/**
+ * Groups an array of experience records by company name, merge continuous
+ * periods of employment and separate periods with time gaps.
+ * @param experiences An array of `ExperienceRecord` objects.
+ * @returns An array of `ExperienceRecordGroup` objects sorted `DESC` by `startYear` property.
+ */
+export function groupExperiences(experiences: ExperienceRecord[]): ExperienceRecordGroup[] {
+  if (!experiences || experiences.length === 0) {
+    return [];
   }
+  const sortedExperiences = [...experiences];
+
+  // Sort by company name & start year
+  sortedExperiences.sort(
+    (a, b) => a.companyName.localeCompare(b.companyName) || a.startYear - b.startYear
+  );
+
+  const grouped = sortedExperiences.reduce<ExperienceRecordGroup[]>((acc, exp) => {
+    // Get most recent created group
+    const lastGroup = acc.length > 0 ? acc[acc.length - 1] : null;
+
+    // Conditions (same company & continuous employment period)
+    const isSameCompany = lastGroup && lastGroup.companyName === exp.companyName;
+    const isContinuous =
+      lastGroup && (lastGroup.endYear === null || exp.startYear <= lastGroup.endYear);
+
+    if (isSameCompany && isContinuous) {
+      // Merge to the existing group
+      lastGroup.items.push(exp);
+
+      if (exp.endYear === null) {
+        lastGroup.endYear = null;
+      } else if (lastGroup.endYear !== null) {
+        lastGroup.endYear = Math.max(lastGroup.endYear, exp.endYear);
+      }
+    } else {
+      // Add to a new group
+      acc.push({
+        companyName: exp.companyName,
+        companyLogo: exp.companyLogo,
+        startYear: exp.startYear,
+        endYear: exp.endYear,
+        items: [exp],
+      });
+    }
+
+    return acc;
+  }, []);
+
+  // Re-sort the final groups startYear (DESC order)
+  return grouped.sort((a, b) => b.startYear - a.startYear);
 }
