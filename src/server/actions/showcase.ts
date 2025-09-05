@@ -1,7 +1,6 @@
 'use server';
 import { withAuthAction, withOptionalAuthAction } from './middleware';
 import * as schema from '@/libs/db/schema';
-import { eq, desc, or } from 'drizzle-orm';
 import { generateShowcaseId } from '../generate-id';
 import { ArticleReviewStatus } from '@/types';
 import { z } from 'zod';
@@ -12,8 +11,14 @@ const createShowcaseSchema = z.object({
     .string()
     .min(1, 'Project URL alias is required')
     .max(50, 'Project URL alias is too long')
-    .regex(/^[a-z0-9-]+$/, 'Project URL alias can only contain lowercase letters, numbers, and hyphens')
-    .refine((alias) => !alias.startsWith('-') && !alias.endsWith('-'), 'Project URL alias cannot start or end with a hyphen'),
+    .regex(
+      /^[a-z0-9-]+$/,
+      'Project URL alias can only contain lowercase letters, numbers, and hyphens'
+    )
+    .refine(
+      alias => !alias.startsWith('-') && !alias.endsWith('-'),
+      'Project URL alias cannot start or end with a hyphen'
+    ),
 });
 
 export const createShowcaseAction = withAuthAction(
@@ -28,7 +33,10 @@ export const createShowcaseAction = withAuthAction(
       });
 
       if (existingShowcase) {
-        return { success: false, error: 'This project URL is already taken. Please choose a different one.' };
+        return {
+          success: false,
+          error: 'This project URL is already taken. Please choose a different one.',
+        };
       }
 
       // Generate unique ID
@@ -80,13 +88,13 @@ export const createShowcaseAction = withAuthAction(
       return {
         success: true,
         showcase,
-        message: 'Showcase created successfully! You can now add more details to your project.'
+        message: 'Showcase created successfully! You can now add more details to your project.',
       };
     } catch (e) {
       if (e instanceof z.ZodError) {
         return {
           success: false,
-          error: e.errors[0]?.message || 'Invalid input data'
+          error: e.errors[0]?.message || 'Invalid input data',
         };
       }
       if (e instanceof Error) {
@@ -97,73 +105,69 @@ export const createShowcaseAction = withAuthAction(
   }
 );
 
-export const checkAliasAvailabilityAction = withAuthAction(
-  async ({ db }, alias: string) => {
-    try {
-      // Validate alias format
-      const aliasSchema = z
-        .string()
-        .min(1, 'Alias is required')
-        .max(50, 'Alias is too long')
-        .regex(/^[a-z0-9-]+$/, 'Alias can only contain lowercase letters, numbers, and hyphens')
-        .refine((alias) => !alias.startsWith('-') && !alias.endsWith('-'), 'Alias cannot start or end with a hyphen');
+export const checkAliasAvailabilityAction = withAuthAction(async ({ db }, alias: string) => {
+  try {
+    // Validate alias format
+    const aliasSchema = z
+      .string()
+      .min(1, 'Alias is required')
+      .max(50, 'Alias is too long')
+      .regex(/^[a-z0-9-]+$/, 'Alias can only contain lowercase letters, numbers, and hyphens')
+      .refine(
+        alias => !alias.startsWith('-') && !alias.endsWith('-'),
+        'Alias cannot start or end with a hyphen'
+      );
 
-      const validatedAlias = aliasSchema.parse(alias);
+    const validatedAlias = aliasSchema.parse(alias);
 
-      // Check if alias is already taken
-      const existingShowcase = await db.query.showcase.findFirst({
-        where: (showcase, { eq }) => eq(showcase.alias, validatedAlias),
+    // Check if alias is already taken
+    const existingShowcase = await db.query.showcase.findFirst({
+      where: (showcase, { eq }) => eq(showcase.alias, validatedAlias),
+    });
+
+    return {
+      success: true,
+      available: !existingShowcase,
+      message: existingShowcase ? 'This URL is already taken' : 'This URL is available',
+    };
+  } catch (e) {
+    if (e instanceof z.ZodError) {
+      return {
+        success: false,
+        error: e.errors[0]?.message || 'Invalid alias format',
+      };
+    }
+    return { success: false, error: 'Failed to check alias availability' };
+  }
+});
+
+export const getApprovedShowcasesAction = withOptionalAuthAction(async ({ db, user }) => {
+  try {
+    let showcases;
+
+    if (typeof user !== 'undefined' && user?.id) {
+      // Single query: Get approved showcases OR user's own showcases
+      showcases = await db.query.showcase.findMany({
+        where: (showcase, { eq, or }) =>
+          or(eq(showcase.reviewStatus, ArticleReviewStatus.Approved), eq(showcase.userId, user.id)),
+        orderBy: (showcase, { desc }) => [desc(showcase.createdAt)],
       });
-
-      return {
-        success: true,
-        available: !existingShowcase,
-        message: existingShowcase ? 'This URL is already taken' : 'This URL is available'
-      };
-    } catch (e) {
-      if (e instanceof z.ZodError) {
-        return {
-          success: false,
-          error: e.errors[0]?.message || 'Invalid alias format'
-        };
-      }
-      return { success: false, error: 'Failed to check alias availability' };
+    } else {
+      // For unauthenticated users, only get approved showcases
+      showcases = await db.query.showcase.findMany({
+        where: (showcase, { eq }) => eq(showcase.reviewStatus, ArticleReviewStatus.Approved),
+        orderBy: (showcase, { desc }) => [desc(showcase.createdAt)],
+      });
     }
-  }
-);
 
-export const getApprovedShowcasesAction = withOptionalAuthAction(
-  async ({ db, user }) => {
-    try {
-      let showcases;
-
-      if (typeof user !== 'undefined' && user?.id) {
-        // Single query: Get approved showcases OR user's own showcases
-        showcases = await db.query.showcase.findMany({
-          where: (showcase, { eq, or }) =>
-            or(
-              eq(showcase.reviewStatus, ArticleReviewStatus.Approved),
-              eq(showcase.userId, user.id)
-            ),
-          orderBy: (showcase, { desc }) => [desc(showcase.createdAt)],
-        });
-      } else {
-        // For unauthenticated users, only get approved showcases
-        showcases = await db.query.showcase.findMany({
-          where: (showcase, { eq }) => eq(showcase.reviewStatus, ArticleReviewStatus.Approved),
-          orderBy: (showcase, { desc }) => [desc(showcase.createdAt)],
-        });
-      }
-
-      return {
-        success: true,
-        showcases
-      };
-    } catch (e) {
-      if (e instanceof Error) {
-        return { success: false, error: e.message };
-      }
-      return { success: false, error: 'Failed to fetch showcases' };
+    return {
+      success: true,
+      showcases,
+    };
+  } catch (e) {
+    if (e instanceof Error) {
+      return { success: false, error: e.message };
     }
+    return { success: false, error: 'Failed to fetch showcases' };
   }
-);
+});
