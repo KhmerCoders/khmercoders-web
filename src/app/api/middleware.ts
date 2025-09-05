@@ -64,10 +64,13 @@ export function withOptionalApiAuth<ResponseType = any>(
   handler: (
     req: NextRequest,
     authContext: Partial<ApiAuthContext>,
-    params: any,
+    params: any
   ) => Promise<NextResponse<ResponseType> | Response>
 ) {
-  return async function (req: NextRequest, params: any): Promise<NextResponse<ResponseType> | Response> {
+  return async function (
+    req: NextRequest,
+    params: any
+  ): Promise<NextResponse<ResponseType> | Response> {
     const session = await auth.api.getSession({
       headers: await headers(),
     });
