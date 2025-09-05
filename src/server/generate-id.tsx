@@ -31,3 +31,20 @@ export function generatePostId() {
 
   return scaled.toString();
 }
+
+/**
+ * Generates a unique random showcase identifier.
+ * The ID is random of number between 1,000,000 and 9,999,999.
+ */
+export function generateShowcaseId() {
+  // Using crypto for cryptographically strong random numbers
+  const array = new Uint32Array(1);
+  crypto.getRandomValues(array);
+
+  // Scale to our range (1,000,000 to 9,999,999)
+  const min = 1_000_000;
+  const max = 9_999_999;
+  const scaled = min + (array[0] % (max - min + 1));
+
+  return scaled.toString();
+}

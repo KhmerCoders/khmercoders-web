@@ -90,12 +90,19 @@ export enum ArticleReviewStatus {
 
 export type ArticlePreviewRecord = Omit<ArticleRecord, 'content'>;
 
+export type ShowcaseRecord = typeof schema.showcase.$inferSelect & {
+  user?: UserRecord & {
+    profile?: ProfileRecord;
+  };
+  hasCurrentUserLiked?: boolean;
+};
+
 export type FeedRecord = (
   | { type: 'article'; data: ArticlePreviewRecord }
   | {
-      type: 'post';
-      data: PostRecordWithProfile;
-    }
+    type: 'post';
+    data: PostRecordWithProfile;
+  }
 ) & {
   createdAt: Date;
   id: string;
