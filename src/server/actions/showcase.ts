@@ -4,6 +4,7 @@ import * as schema from '@/libs/db/schema';
 import { generateShowcaseId } from '../generate-id';
 import { ArticleReviewStatus } from '@/types';
 import { z } from 'zod';
+import { eq } from 'drizzle-orm';
 
 const createShowcaseSchema = z.object({
   name: z.string().min(1, 'Project name is required').max(100, 'Project name is too long'),
@@ -171,3 +172,46 @@ export const getApprovedShowcasesAction = withOptionalAuthAction(async ({ db, us
     return { success: false, error: 'Failed to fetch showcases' };
   }
 });
+
+
+export const updateShowcaseDescriptionAction = withAuthAction(
+  async ({ db, user }, data: { showcaseId: string; description: string }) => {
+    try {
+      // Validate input
+      const inputSchema = z.object({
+        showcaseId: z.string().min(1, 'Showcase ID is required'),
+        description: z.string().max(1000, 'Description is too long'),
+      });
+
+      const validatedData = inputSchema.parse(data);
+
+      // Check if the showcase exists and belongs to the user
+      const showcase = await db.query.showcase.findFirst({
+        where: (showcase, { eq }) =>
+          eq(showcase.id, validatedData.showcaseId) && eq(showcase.userId, user.id),
+      });
+
+      if (!showcase) {
+        return { success: false, error: 'Showcase not found or you do not have permission' };
+      }
+
+      // Update the description
+      await db.update(schema.showcase).set({ description: validatedData.description }).where(
+        eq(schema.showcase.id, validatedData.showcaseId)
+      );
+
+      return { success: true };
+    } catch (e) {
+      if (e instanceof z.ZodError) {
+        return {
+          success: false,
+          error: e.errors[0]?.message || 'Invalid input data',
+        };
+      }
+      if (e instanceof Error) {
+        return { success: false, error: e.message };
+      }
+      return { success: false, error: 'Failed to update showcase description' };
+    }
+  }
+);
