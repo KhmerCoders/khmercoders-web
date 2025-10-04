@@ -36,7 +36,7 @@ export enum UserLevel {
   SuperAdmin = 20,
 }
 
-export type BindingResourceType = 'profile' | 'article';
+export type BindingResourceType = 'profile' | 'article' | 'showcase';
 export type LikableResourceType = 'article' | 'post';
 export type PostableResourceType = 'article' | 'post';
 
@@ -100,9 +100,9 @@ export type ShowcaseRecord = typeof schema.showcase.$inferSelect & {
 export type FeedRecord = (
   | { type: 'article'; data: ArticlePreviewRecord }
   | {
-      type: 'post';
-      data: PostRecordWithProfile;
-    }
+    type: 'post';
+    data: PostRecordWithProfile;
+  }
 ) & {
   createdAt: Date;
   id: string;

@@ -96,6 +96,31 @@ export async function uploadFile(
   };
 }
 
+export async function syncUploadFilesToResource(userId: string,
+  urls: string[],
+  resourceType: BindingResourceType,
+  resourceId: string) {
+  const db = await getDB();
+
+  // Getting all the upload ID
+  const uploadRecords = await db.query.userUpload.findMany({
+    where: (upload, { and, inArray }) =>
+      and(inArray(upload.fileUrl, urls), eq(upload.userId, userId)),
+  });
+
+  const uploadRecordTable = new Set(uploadRecords.map(upload => upload.fileUrl));
+
+  // Find which image URLs don't have corresponding upload records
+  if (uploadRecords.length !== urls.length) {
+    const missingImages = urls.filter(url => !uploadRecordTable.has(url));
+    throw new Error(
+      `The following images are not found in your uploads:\n${missingImages.map(m => `- ${m}`).join('\n')}`
+    );
+  }
+
+  return syncUploadsToResource(userId, uploadRecords.map(upload => upload.id), resourceType, resourceId);
+}
+
 /**
  * Associates uploaded files with specific resources in the system.
  *

@@ -4,7 +4,7 @@ import { withAuthAction } from './middleware';
 import * as schema from '@/libs/db/schema';
 import { eq } from 'drizzle-orm';
 import { getMarkdownImageUrls } from '@/utils/markdown';
-import { syncUploadsToResource } from '@/server/services/upload';
+import { syncUploadFilesToResource, syncUploadsToResource } from '@/server/services/upload';
 import { DrizzleD1Database } from 'drizzle-orm/d1';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { getDB } from '@/libs/db';
@@ -250,25 +250,9 @@ async function syncResource(
   // Getting all the images in the content
   const imageURLs = Array.from(imageURLTable);
 
-  // Getting all the upload ID
-  const uploadRecords = await db.query.userUpload.findMany({
-    where: (upload, { and, inArray }) =>
-      and(inArray(upload.fileUrl, imageURLs), eq(upload.userId, userId)),
-  });
-
-  const uploadRecordTable = new Set(uploadRecords.map(upload => upload.fileUrl));
-
-  // Find which image URLs don't have corresponding upload records
-  if (uploadRecords.length !== imageURLs.length) {
-    const missingImages = imageURLs.filter(url => !uploadRecordTable.has(url));
-    throw new Error(
-      `The following images are not found in your uploads:\n${missingImages.map(m => `- ${m}`).join('\n')}`
-    );
-  }
-
-  await syncUploadsToResource(
+  await syncUploadFilesToResource(
     userId,
-    uploadRecords.map(upload => upload.id),
+    imageURLs,
     'article',
     resourceId
   );

@@ -7,15 +7,14 @@ import { Pencil } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import { updateShowcaseDescriptionAction } from '@/server/actions/showcase';
 import { MarkdownContent } from '@/components/MarkdownContent';
+import { useCurrentShowcase } from './provider';
 
 export function ShowcaseDescription({ showcase }: { showcase: ShowcaseRecord }) {
   const [description, setDescription] = useState<string>(showcase.description ?? '');
   const [staging, setStaging] = useState<string>(description);
   const [editMode, setEditMode] = useState(false);
 
-  const { session } = useSession();
-  const user = session?.user;
-  const isOwner = user && showcase.userId === user.id;
+  const { isOwner } = useCurrentShowcase();
 
   const handleSave = useCallback(async () => {
     try {
@@ -61,7 +60,7 @@ export function ShowcaseDescription({ showcase }: { showcase: ShowcaseRecord }) 
   }
 
   return (
-    <p className="px-6 text-sm">
+    <article className="px-6 text-sm">
       <div className="markdown">
         <MarkdownContent withoutMedia>
           {description ? description : '**No description available.**'}
@@ -77,6 +76,6 @@ export function ShowcaseDescription({ showcase }: { showcase: ShowcaseRecord }) 
           Edit
         </div>
       )}
-    </p>
+    </article>
   );
 }

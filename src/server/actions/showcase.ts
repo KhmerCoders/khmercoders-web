@@ -5,6 +5,7 @@ import { generateShowcaseId } from '../generate-id';
 import { ArticleReviewStatus } from '@/types';
 import { z } from 'zod';
 import { eq } from 'drizzle-orm';
+import { syncUploadFilesToResource, syncUploadsToResource } from '../services/upload';
 
 const createShowcaseSchema = z.object({
   name: z.string().min(1, 'Project name is required').max(100, 'Project name is too long'),
@@ -215,3 +216,13 @@ export const updateShowcaseDescriptionAction = withAuthAction(
     }
   }
 );
+
+export const updateShowcaseLogoAction = withAuthAction(async ({ db, user }, data: { showcaseId: string; logo: string }) => {
+  // Making sure the logo is a valid URL and belong to current user as well
+  await syncUploadFilesToResource(user.id, [data.logo], 'showcase', data.showcaseId);
+
+  // Update the showcase
+  await db.update(schema.showcase).set({ logo: data.logo }).where(eq(schema.showcase.id, data.showcaseId));
+
+  return { success: true };
+});

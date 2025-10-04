@@ -1,11 +1,13 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { getShowcaseByAlias } from '@/server/services/showcase';
-import { ExternalLinkIcon, GithubIcon, CalendarIcon, HeartIcon, ArrowLeftIcon } from 'lucide-react';
+import { GithubIcon } from 'lucide-react';
 import { buttonVariants } from '@/components/generated/button';
 import { MainLayout } from '@/components/blocks/layout/MainLayout';
 import { StackNavigation } from '@/components/blocks/layout/StackNavigation';
 import { ShowcaseDescription } from './description';
+import { ShowcaseProvider } from './provider';
+import { ShowcaseLogo } from './logo';
 
 interface ShowcasePageProps {
   params: Promise<{
@@ -15,6 +17,7 @@ interface ShowcasePageProps {
 
 export default async function ShowcasePage({ params }: ShowcasePageProps) {
   const { alias } = await params;
+
   const showcase = await getShowcaseByAlias(alias);
 
   // Check if showcase exists and is viewable
@@ -24,36 +27,38 @@ export default async function ShowcasePage({ params }: ShowcasePageProps) {
 
   return (
     <MainLayout hideRightNav>
-      <StackNavigation defaultBackURL="/showcase" />
+      <ShowcaseProvider showcase={showcase}>
+        <StackNavigation defaultBackURL="/showcase" />
 
-      <div className="flex gap-4 p-6">
-        <div className="w-16 h-16 rounded bg-gray-500"></div>
-        <div className="flex flex-col justify-center">
-          <div className="font-semibold text-lg">{showcase.title}</div>
-          <div className="text-muted-foreground">Short Summary</div>
+        <div className="flex gap-4 p-6">
+          <ShowcaseLogo />
+          <div className="flex flex-col justify-center">
+            <div className="font-semibold text-lg">{showcase.title}</div>
+            <div className="text-muted-foreground">Short Summary</div>
+          </div>
         </div>
-      </div>
 
-      <div className="flex items-center gap-4 px-6 mb-4">
-        <Link
-          href={showcase.github}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={buttonVariants({ variant: 'outline', size: 'sm' })}
-        >
-          <GithubIcon className="w-4 h-4" />
-          GitHub
-        </Link>
-      </div>
+        <div className="flex items-center gap-4 px-6 mb-4">
+          <Link
+            href={showcase.github}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={buttonVariants({ variant: 'outline', size: 'sm' })}
+          >
+            <GithubIcon className="w-4 h-4" />
+            GitHub
+          </Link>
+        </div>
 
-      <ShowcaseDescription showcase={showcase} />
+        <ShowcaseDescription showcase={showcase} />
 
-      <div className="px-6 mt-6">
-        <div
-          className="rounded-lg overflow-hidden bg-gray-200 flex items-center justify-center"
-          style={{ aspectRatio: '16 / 9', height: 250, maxHeight: 250 }}
-        ></div>
-      </div>
+        <div className="px-6 mt-6">
+          <div
+            className="rounded-lg overflow-hidden bg-gray-200 flex items-center justify-center"
+            style={{ aspectRatio: '16 / 9', height: 250, maxHeight: 250 }}
+          ></div>
+        </div>
+      </ShowcaseProvider>
     </MainLayout>
   );
 }
