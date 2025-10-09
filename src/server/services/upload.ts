@@ -96,10 +96,12 @@ export async function uploadFile(
   };
 }
 
-export async function syncUploadFilesToResource(userId: string,
+export async function syncUploadFilesToResource(
+  userId: string,
   urls: string[],
   resourceType: BindingResourceType,
-  resourceId: string) {
+  resourceId: string
+) {
   const db = await getDB();
 
   // Getting all the upload ID
@@ -118,7 +120,12 @@ export async function syncUploadFilesToResource(userId: string,
     );
   }
 
-  return syncUploadsToResource(userId, uploadRecords.map(upload => upload.id), resourceType, resourceId);
+  return syncUploadsToResource(
+    userId,
+    uploadRecords.map(upload => upload.id),
+    resourceType,
+    resourceId
+  );
 }
 
 /**

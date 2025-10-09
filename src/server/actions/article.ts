@@ -250,12 +250,7 @@ async function syncResource(
   // Getting all the images in the content
   const imageURLs = Array.from(imageURLTable);
 
-  await syncUploadFilesToResource(
-    userId,
-    imageURLs,
-    'article',
-    resourceId
-  );
+  await syncUploadFilesToResource(userId, imageURLs, 'article', resourceId);
 }
 
 export const updateArticleStatusAction = withAuthAction(

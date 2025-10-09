@@ -174,7 +174,6 @@ export const getApprovedShowcasesAction = withOptionalAuthAction(async ({ db, us
   }
 });
 
-
 export const updateShowcaseDescriptionAction = withAuthAction(
   async ({ db, user }, data: { showcaseId: string; description: string }) => {
     try {
@@ -197,9 +196,10 @@ export const updateShowcaseDescriptionAction = withAuthAction(
       }
 
       // Update the description
-      await db.update(schema.showcase).set({ description: validatedData.description }).where(
-        eq(schema.showcase.id, validatedData.showcaseId)
-      );
+      await db
+        .update(schema.showcase)
+        .set({ description: validatedData.description })
+        .where(eq(schema.showcase.id, validatedData.showcaseId));
 
       return { success: true };
     } catch (e) {
@@ -217,12 +217,17 @@ export const updateShowcaseDescriptionAction = withAuthAction(
   }
 );
 
-export const updateShowcaseLogoAction = withAuthAction(async ({ db, user }, data: { showcaseId: string; logo: string }) => {
-  // Making sure the logo is a valid URL and belong to current user as well
-  await syncUploadFilesToResource(user.id, [data.logo], 'showcase', data.showcaseId);
+export const updateShowcaseLogoAction = withAuthAction(
+  async ({ db, user }, data: { showcaseId: string; logo: string }) => {
+    // Making sure the logo is a valid URL and belong to current user as well
+    await syncUploadFilesToResource(user.id, [data.logo], 'showcase', data.showcaseId);
 
-  // Update the showcase
-  await db.update(schema.showcase).set({ logo: data.logo }).where(eq(schema.showcase.id, data.showcaseId));
+    // Update the showcase
+    await db
+      .update(schema.showcase)
+      .set({ logo: data.logo })
+      .where(eq(schema.showcase.id, data.showcaseId));
 
-  return { success: true };
-});
+    return { success: true };
+  }
+);
