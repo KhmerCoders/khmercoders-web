@@ -80,6 +80,7 @@ export function UserProfileMenu() {
             </div>
           </Link>
         </DropdownMenuItem>
+
         <DropdownMenuItem asChild>
           <Link href={`/@${profile?.alias}/articles`} className="cursor-pointer">
             <Newspaper className="mr-2 h-4 w-4" />
@@ -94,9 +95,6 @@ export function UserProfileMenu() {
           <Link href={'/profile/storage'} className="cursor-pointer">
             <Files className="mr-2 h-4 w-4" />
             Your Storage
-            <div className="grow flex justify-end">
-              <Badge>Beta</Badge>
-            </div>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />

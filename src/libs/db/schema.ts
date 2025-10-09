@@ -279,6 +279,35 @@ export const cacheTable = sqliteTable('caches', {
   updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull(),
 });
 
+export const showcase = sqliteTable('showcase', {
+  id: text('id').primaryKey().notNull(),
+  alias: text('alias').notNull(),
+  userId: text('user_id').notNull(),
+  title: text('title').notNull(),
+  description: text('description').notNull(),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
+  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull(),
+
+  // Link
+  website: text('website_url').notNull(),
+  github: text('github_url').notNull(),
+
+  // Media
+  logo: text('logo').notNull(),
+  coverImage: text('cover_image').notNull(),
+
+  // Social
+  likeCount: integer('like_count').notNull().default(0),
+  commentCount: integer('comment_count').notNull().default(0),
+
+  // For moderation
+  reviewStatus: text('review_status')
+    .notNull()
+    .default(ArticleReviewStatus.Pending)
+    .$type<ArticleReviewStatus>(),
+  reviewBy: text('review_by'), // User ID of the reviewer
+});
+
 // Relations
 export const userUploadRelationship = relations(userUpload, ({ one, many }) => ({
   bindings: many(userUploadBinding),
@@ -301,4 +330,8 @@ export const articleRelationship = relations(article, ({ one }) => ({
 
 export const postRelationship = relations(posts, ({ one }) => ({
   user: one(user, { fields: [posts.userId], references: [user.id] }),
+}));
+
+export const showcaseRelationship = relations(showcase, ({ one }) => ({
+  user: one(user, { fields: [showcase.userId], references: [user.id] }),
 }));
