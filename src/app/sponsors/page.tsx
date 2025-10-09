@@ -148,7 +148,9 @@ function EventSponsorSection() {
               return (
                 <TableRow key={partner.id}>
                   <TableCell>
-                    <div className="w-8 h-8 bg-gray-500 rounded"></div>
+                    <div className="w-8 h-5 bg-black-500 rounded">
+                      <img src={partner.logo}></img>
+                    </div>
                   </TableCell>
                   <TableCell className="font-medium">
                     <Link href={partner.website} target="_blank">
