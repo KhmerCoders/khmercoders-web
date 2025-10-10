@@ -168,7 +168,7 @@ export const partners: IPartner[] = [
     name: 'Horpao',
     description:
       'Hor Pao is a Cambodian POS and loyalty app helping small businesses manage sales, finances, and customer rewards efficiently.',
-    logo: '/assets/images/partners/horpao.svg?height=200&width=400',
+    logo: '/assets/images/partners/horpao.png?height=200&width=400',
     website: 'https://horpao.com',
   },
   {

@@ -1,6 +1,7 @@
 'use client';
 
 import { useSession } from '@/components/auth-provider';
+import { StackNavigation } from '@/components/blocks/layout/StackNavigation';
 import { Button } from '@/components/generated/button';
 import { Input } from '@/components/generated/input';
 import { updateUserAliasAction } from '@/server/actions/users';
@@ -57,6 +58,7 @@ export default function ProfileSetupPage() {
 
   return (
     <div className="flex flex-col items-center justify-center h-screen max-w-md mx-auto px-4">
+      <StackNavigation defaultBackURL="/profile/setup/" />
       <h1 className="text-2xl font-bold mb-4">Profile Setup</h1>
       <p className="text-muted-foreground mb-6">Please complete your profile setup to continue.</p>
 
