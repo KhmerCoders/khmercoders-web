@@ -5,6 +5,7 @@ import { DialogHeader, DialogFooter } from '@/components/generated/dialog';
 import { Input } from '@/components/generated/input';
 import { Label } from '@/components/generated/label';
 import { Textarea } from '@/components/generated/textarea';
+import { StackNavigation } from '@/components/blocks/layout/StackNavigation';
 import {
   Dialog,
   DialogContent,
@@ -138,6 +139,7 @@ export default function ProfileSetupExperiencePage() {
 
   return (
     <div className="container mx-auto py-8 max-w-4xl px-4">
+      <StackNavigation defaultBackURL="/profile/setup/" />
       <div className="mb-8 border-b border-gray-800 pb-4">
         <h1 className="text-3xl font-bold tracking-tight mb-2">Work Experience</h1>
         <p className="text-muted-foreground">
