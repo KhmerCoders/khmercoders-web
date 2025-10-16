@@ -36,7 +36,6 @@ export async function generateMetadata({
   return {
     title: `${event.title} | Khmer Coders`,
     description: event.description,
-    agenda: event.agenda,
     openGraph: {
       images: [event.image],
       title: event.title,
