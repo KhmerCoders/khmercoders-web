@@ -101,15 +101,15 @@ export default async function EventDetailPage({ params }: { params: { alias: str
       <div className="p-4 border-t">
         <h1 className="font-bold mb-4">Agenda</h1>
         <div className="rounded overflow-hidden border">
-        <Table>
-          <TableHeader className='bg-secondary'>
-            <TableRow>
-              <TableHead>Activity</TableHead>
-              <TableHead>Time</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-              {event.agenda.map((section) =>
+          <Table>
+            <TableHeader className="bg-secondary">
+              <TableRow>
+                <TableHead>Activity</TableHead>
+                <TableHead>Time</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {event.agenda.map(section =>
                 section.data.map((item, i) => (
                   <TableRow key={`${section.title}-${i}`}>
                     <TableCell>{item.time}</TableCell>
@@ -117,8 +117,8 @@ export default async function EventDetailPage({ params }: { params: { alias: str
                   </TableRow>
                 ))
               )}
-          </TableBody>
-        </Table>
+            </TableBody>
+          </Table>
         </div>
         <br></br>
         <p>Moderated by {event.by}</p>

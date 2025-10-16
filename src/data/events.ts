@@ -21,7 +21,7 @@ export interface EventData {
   image: string;
   badge?: string;
   agenda?: EventAgendaGroup[];
-  by?: string,
+  by?: string;
   sponsors: {
     type: SponsorType;
     id: PartnerIds;
@@ -165,38 +165,73 @@ export const eventsDatabase: EventData[] = [
     image: '/assets/images/events/4.jpg?height=400&width=600',
     badge: 'Meetup',
     agenda: [
-      {title: 'Tentative Agenda', data: [{
-        time: '2:00 – 2:30 PM',
-        topic: 'Registration & Welcome Coffee',
-  },],},
-  {data: [{
-        time: '2:30 – 2:45 PM',
-        topic: 'Opening Remarks • Representatives from Founder of Khmer Coders Community',
-  },],},
-  {data: [{
-        time: '2:45 – 4:30 PM',
-        topic: 'Individual Presentations (20 to 30 mins each and Q&A) • Daisuke Komatsubara – Trends in AI Agent Development • Takeshi Izuka – AI and Future of Work • Vor Sokhna – AI Applications in Cambodia’s Enterprises • In Visal – Coding Culture and Developer Ecosystem in Cambodia • Buoy Rina – Building Human-Centered AI • Sreang Rantanak – Bridging AI Research and Real-World Applications',
-  },],},
-  {data: [{
-        time: '4:30 – 5:15 PM',
-        topic: 'Panel Discussion: “AI Agents & Coding for the Next Decade” Moderated by Sum Sopha',
-  },],},
-  {data: [{
-        time: '5:15 – 5:30 PM',
-        topic: 'Coffee Break & Group Photo & Networking',
-  },],},
-  {data: [{
-        time: '5:30 – 7:00 PM',
-        topic: 'Showcase Session • Startup demos, AI agent showcases, and coding projects ',
-  },],},
-  {data: [{
-        time: '7:00 – 7:30 PM',
-        topic: 'Sponsors Speech and Closing Remarks',
-  },],},
-  {data: [{
-        time: '7:39 – 9:00 PM',
-        topic: 'Evening Party & Networking • Informal gathering with music, food, and drinks ',
-  },],},
+      {
+        title: 'Tentative Agenda',
+        data: [
+          {
+            time: '2:00 – 2:30 PM',
+            topic: 'Registration & Welcome Coffee',
+          },
+        ],
+      },
+      {
+        data: [
+          {
+            time: '2:30 – 2:45 PM',
+            topic: 'Opening Remarks • Representatives from Founder of Khmer Coders Community',
+          },
+        ],
+      },
+      {
+        data: [
+          {
+            time: '2:45 – 4:30 PM',
+            topic:
+              'Individual Presentations (20 to 30 mins each and Q&A) • Daisuke Komatsubara – Trends in AI Agent Development • Takeshi Izuka – AI and Future of Work • Vor Sokhna – AI Applications in Cambodia’s Enterprises • In Visal – Coding Culture and Developer Ecosystem in Cambodia • Buoy Rina – Building Human-Centered AI • Sreang Rantanak – Bridging AI Research and Real-World Applications',
+          },
+        ],
+      },
+      {
+        data: [
+          {
+            time: '4:30 – 5:15 PM',
+            topic:
+              'Panel Discussion: “AI Agents & Coding for the Next Decade” Moderated by Sum Sopha',
+          },
+        ],
+      },
+      {
+        data: [
+          {
+            time: '5:15 – 5:30 PM',
+            topic: 'Coffee Break & Group Photo & Networking',
+          },
+        ],
+      },
+      {
+        data: [
+          {
+            time: '5:30 – 7:00 PM',
+            topic: 'Showcase Session • Startup demos, AI agent showcases, and coding projects ',
+          },
+        ],
+      },
+      {
+        data: [
+          {
+            time: '7:00 – 7:30 PM',
+            topic: 'Sponsors Speech and Closing Remarks',
+          },
+        ],
+      },
+      {
+        data: [
+          {
+            time: '7:39 – 9:00 PM',
+            topic: 'Evening Party & Networking • Informal gathering with music, food, and drinks ',
+          },
+        ],
+      },
     ],
     by: 'Sopha Sum',
     sponsors: [
