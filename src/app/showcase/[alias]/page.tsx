@@ -8,6 +8,7 @@ import { StackNavigation } from '@/components/blocks/layout/StackNavigation';
 import { ShowcaseDescription } from './description';
 import { ShowcaseProvider } from './provider';
 import { ShowcaseLogo } from './logo';
+import { ShowcaseMediaSection } from './media';
 
 interface ShowcasePageProps {
   params: Promise<{
@@ -52,12 +53,7 @@ export default async function ShowcasePage({ params }: ShowcasePageProps) {
 
         <ShowcaseDescription showcase={showcase} />
 
-        <div className="px-6 mt-6">
-          <div
-            className="rounded-lg overflow-hidden bg-gray-200 flex items-center justify-center"
-            style={{ aspectRatio: '16 / 9', height: 250, maxHeight: 250 }}
-          ></div>
-        </div>
+        <ShowcaseMediaSection />
       </ShowcaseProvider>
     </MainLayout>
   );

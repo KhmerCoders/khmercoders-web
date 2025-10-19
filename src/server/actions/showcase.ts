@@ -5,7 +5,7 @@ import { generateShowcaseId } from '../generate-id';
 import { ArticleReviewStatus } from '@/types';
 import { z } from 'zod';
 import { eq } from 'drizzle-orm';
-import { syncUploadFilesToResource, syncUploadsToResource } from '../services/upload';
+import { syncUploadFilesToResource } from '../services/upload';
 
 const createShowcaseSchema = z.object({
   name: z.string().min(1, 'Project name is required').max(100, 'Project name is too long'),
@@ -226,6 +226,21 @@ export const updateShowcaseLogoAction = withAuthAction(
     await db
       .update(schema.showcase)
       .set({ logo: data.logo })
+      .where(eq(schema.showcase.id, data.showcaseId));
+
+    return { success: true };
+  }
+);
+
+export const updateShowcaseCoverImageAction = withAuthAction(
+  async ({ db, user }, data: { showcaseId: string; coverImage: string[] }) => {
+    // Making sure the cover image is a valid URL and belong to current user as well
+    await syncUploadFilesToResource(user.id, data.coverImage, 'showcase-banner', data.showcaseId);
+
+    // Update the showcase
+    await db
+      .update(schema.showcase)
+      .set({ coverImage: data.coverImage.join(',') })
       .where(eq(schema.showcase.id, data.showcaseId));
 
     return { success: true };
