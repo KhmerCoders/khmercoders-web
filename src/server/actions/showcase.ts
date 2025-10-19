@@ -4,7 +4,7 @@ import * as schema from '@/libs/db/schema';
 import { generateShowcaseId } from '../generate-id';
 import { ArticleReviewStatus } from '@/types';
 import { z } from 'zod';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { syncUploadFilesToResource } from '../services/upload';
 
 const createShowcaseSchema = z.object({
@@ -241,8 +241,23 @@ export const updateShowcaseCoverImageAction = withAuthAction(
     await db
       .update(schema.showcase)
       .set({ coverImage: data.coverImage.join(',') })
-      .where(eq(schema.showcase.id, data.showcaseId));
+      .where(and(eq(schema.showcase.id, data.showcaseId), eq(schema.showcase.userId, user.id)));
 
     return { success: true };
+  }
+);
+
+export const updateShowcaseLinksAction = withAuthAction(
+  async (
+    { db, user },
+    data: { showcaseId: string; github?: string; website?: string }
+  ) => {
+    await db.update(schema.showcase).set({
+      github: data.github,
+      website: data.website,
+    }).where(and(
+      eq(schema.showcase.id, data.showcaseId),
+      eq(schema.showcase.userId, user.id)
+    ));
   }
 );

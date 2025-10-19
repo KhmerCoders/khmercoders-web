@@ -1,14 +1,13 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { getShowcaseByAlias } from '@/server/services/showcase';
-import { GithubIcon } from 'lucide-react';
-import { buttonVariants } from '@/components/generated/button';
 import { MainLayout } from '@/components/blocks/layout/MainLayout';
 import { StackNavigation } from '@/components/blocks/layout/StackNavigation';
 import { ShowcaseDescription } from './description';
 import { ShowcaseProvider } from './provider';
 import { ShowcaseLogo } from './logo';
 import { ShowcaseMediaSection } from './media';
+import { ShowcaseLinkSection } from './link';
 
 interface ShowcasePageProps {
   params: Promise<{
@@ -39,17 +38,7 @@ export default async function ShowcasePage({ params }: ShowcasePageProps) {
           </div>
         </div>
 
-        <div className="flex items-center gap-4 px-6 mb-4">
-          <Link
-            href={showcase.github}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={buttonVariants({ variant: 'outline', size: 'sm' })}
-          >
-            <GithubIcon className="w-4 h-4" />
-            GitHub
-          </Link>
-        </div>
+        <ShowcaseLinkSection />
 
         <ShowcaseDescription showcase={showcase} />
 
