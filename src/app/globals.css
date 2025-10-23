@@ -243,3 +243,17 @@ based on light & dark themes */
 .markdown hr {
   @apply border-t border-gray-300 dark:border-gray-600 my-4;
 }
+
+/* Experience Item Style */
+.experience-item {
+  @apply isolate relative;
+
+  /* dot */
+  &::after {
+    @apply content-[''] absolute w-2 h-2 bg-orange-400 rounded-full mt-1.5 top-0 -left-9;
+  }
+  /* vertical line */
+  &::before:not(:last-child) {
+    @apply box-border absolute content-[''] h-[calc(100%-theme(spacing.4))] w-0.5 bg-orange-400/30 mt-6 top-0 -left-[2.075rem];
+  }
+}
