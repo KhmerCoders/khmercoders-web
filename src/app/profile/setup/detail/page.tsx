@@ -161,8 +161,8 @@ export default function ProfileSetupDetailPage() {
         });
 
         // Redirect to the user's profile page using their alias
-        if (profile?.alias) {
-          router.push(`/@${profile.alias}`);
+        if (result?.alias) {
+          router.push(`/@${result.alias}`);
         } else {
           router.push('/profile');
         }
