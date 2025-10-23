@@ -176,9 +176,17 @@ export const updateUserProfileAction = withAuthAction(
           .where(eq(schema.memberProfile.userId, user.id)),
       ]);
 
+      const updatedProfile = await db.query.memberProfile.findFirst({
+        where: eq(schema.memberProfile.userId, user.id),
+        columns: {
+          alias: true,
+        },
+      });
+
       return {
         success: true,
         message: 'Profile updated successfully.',
+        alias: updatedProfile?.alias,
       };
     } catch (error) {
       console.error('Failed to update profile:', error);
