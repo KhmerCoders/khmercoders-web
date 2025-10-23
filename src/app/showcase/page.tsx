@@ -17,7 +17,7 @@ export default function ShowcasePage() {
   ].includes(session?.user.level ?? UserLevel.Basic);
 
   return (
-    <MainLayout>
+    <MainLayout hideRightNav>
       <StackNavigation title="Showcase" />
       {isBeta ? <ShowcaseBetaPage /> : <ShowcaseUpcoming />}
     </MainLayout>

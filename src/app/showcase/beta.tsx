@@ -1,19 +1,12 @@
 'use client';
 
 import { buttonVariants } from '@/components/generated/button';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/generated/table';
 import { getApprovedShowcasesAction } from '@/server/actions/showcase';
 import Link from 'next/link';
 import { LoaderIcon, Heart } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { ShowcaseRecord } from '@/types';
+import { cn } from '@/utils';
 
 export function ShowcaseBetaPage() {
   const [showcases, setShowcases] = useState<ShowcaseRecord[]>([]);
@@ -74,37 +67,46 @@ export function ShowcaseBetaPage() {
           <p>Be the first to share your project with the community!</p>
         </div>
       ) : (
-        <div className="px-4">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-16">No.</TableHead>
-                <TableHead>Showcase Name</TableHead>
-                <TableHead className="text-right w-20">Likes</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {showcases.map((showcase, index) => (
-                <TableRow key={showcase.id}>
-                  <TableCell className="font-medium">{index + 1}</TableCell>
-                  <TableCell>
-                    <Link
-                      href={`/showcase/${showcase.alias}`}
-                      className="font-semibold hover:underline text-blue-600 hover:text-blue-800"
-                    >
-                      {showcase.title}
-                    </Link>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex items-center justify-end space-x-1">
-                      <Heart className="w-4 h-4 text-red-500" />
-                      <span>{showcase.likeCount || 0}</span>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+        <div className="px-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+          {showcases.map(showcase => {
+            const coverImage = showcase.coverImage.split(',')[0];
+
+            return (
+              <Link
+                key={showcase.id}
+                href={`/showcase/${showcase.alias}`}
+                className={cn('block', 'rounded-lg', 'border', 'overflow-hidden')}
+              >
+                <div className="w-full aspect-[2/1] bg-gray-200 relative border-b">
+                  {coverImage ? (
+                    <img
+                      src={coverImage}
+                      alt={showcase.title}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gray-200" />
+                  )}
+
+                  {showcase.logo ? (
+                    <img
+                      src={showcase.logo}
+                      alt={showcase.title}
+                      className="w-24 h-24 mb-2 border border-4 border-white absolute -bottom-8 left-4"
+                    />
+                  ) : (
+                    <div className="w-24 h-24 mb-2 border border-4 border-white absolute -bottom-8 left-4 bg-gray-300 rounded" />
+                  )}
+                </div>
+                <div className="p-4 pt-8 flex flex-col">
+                  <div className="font-medium text-lg">{showcase.title}</div>
+                  <div className="flex items-center text-sm text-muted-foreground">
+                    {showcase.user?.name}
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
         </div>
       )}
     </div>

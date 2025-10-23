@@ -153,12 +153,18 @@ export const getApprovedShowcasesAction = withOptionalAuthAction(async ({ db, us
         where: (showcase, { eq, or }) =>
           or(eq(showcase.reviewStatus, ArticleReviewStatus.Approved), eq(showcase.userId, user.id)),
         orderBy: (showcase, { desc }) => [desc(showcase.createdAt)],
+        with: {
+          user: true,
+        }
       });
     } else {
       // For unauthenticated users, only get approved showcases
       showcases = await db.query.showcase.findMany({
         where: (showcase, { eq }) => eq(showcase.reviewStatus, ArticleReviewStatus.Approved),
         orderBy: (showcase, { desc }) => [desc(showcase.createdAt)],
+        with: {
+          user: true,
+        }
       });
     }
 
