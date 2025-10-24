@@ -187,7 +187,7 @@ export const updateShowcaseDescriptionAction = withAuthAction(
       const inputSchema = z.object({
         showcaseId: z.string().min(1, 'Showcase ID is required'),
         description: z.optional(z.string().max(1000, 'Description is too long')),
-        tagline: z.optional(z.string().max(100, 'Tagline is too long')),
+        tagline: z.optional(z.string().max(200, 'Tagline is too long')),
       });
 
       const validatedData = inputSchema.parse(data);
