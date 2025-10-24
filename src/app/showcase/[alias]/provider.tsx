@@ -1,15 +1,15 @@
 'use client';
 import { useSession } from '@/components/auth-provider';
 import { ShowcaseRecord } from '@/types';
-import { createContext, useContext } from 'react';
+import { createContext, PropsWithChildren, useContext, useState } from 'react';
 
-const ShowcaseOwnerContext = createContext<
-  | {
-      isOwner: boolean;
-      showcase: ShowcaseRecord;
-    }
-  | undefined
->(undefined);
+interface ShowcaseProviderProps {
+  isOwner: boolean;
+  showcase: ShowcaseRecord;
+  setShowcase: React.Dispatch<React.SetStateAction<ShowcaseRecord>>;
+}
+
+const ShowcaseOwnerContext = createContext<ShowcaseProviderProps | undefined>(undefined);
 
 export function useCurrentShowcase() {
   const ctx = useContext(ShowcaseOwnerContext);
@@ -23,16 +23,17 @@ export function useCurrentShowcase() {
 export function ShowcaseProvider({
   children,
   showcase,
-}: {
-  children: React.ReactNode;
-  showcase: ShowcaseRecord;
-}) {
+}: PropsWithChildren<{ showcase: ShowcaseRecord }>) {
   const { session } = useSession();
+  const [localShowcase, setLocalShowcase] = useState(showcase);
+
   const user = session?.user;
   const isOwner = user ? showcase?.userId === user.id : false;
 
   return (
-    <ShowcaseOwnerContext.Provider value={{ isOwner, showcase }}>
+    <ShowcaseOwnerContext.Provider
+      value={{ isOwner, showcase: localShowcase, setShowcase: setLocalShowcase }}
+    >
       {children}
     </ShowcaseOwnerContext.Provider>
   );

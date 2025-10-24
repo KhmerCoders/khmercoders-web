@@ -1,7 +1,7 @@
 'use client';
 
 import { Button, buttonVariants } from '@/components/generated/button';
-import { Ellipsis, GithubIcon, Globe } from 'lucide-react';
+import { Ellipsis, GithubIcon, Link as LinkIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useCurrentShowcase } from './provider';
 import {
@@ -62,7 +62,7 @@ export function ShowcaseLinkSection() {
   };
 
   return (
-    <div className="flex items-center gap-2 px-6 mb-4">
+    <div className="flex items-center gap-6 px-6 mb-4">
       <Dialog
         open={modalType !== null}
         onOpenChange={openState => {
@@ -110,53 +110,59 @@ export function ShowcaseLinkSection() {
       </Dialog>
 
       {websiteURL && (
-        <Link
-          href={websiteURL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={buttonVariants({ variant: 'outline', size: 'sm' })}
-        >
-          <Globe className="mr-2" size={16} />
-          Website
-        </Link>
+        <div className="text-sm flex items-center">
+          <LinkIcon className="mr-2" size={14} />
+          <Link
+            href={websiteURL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:underline hover:text-blue-600"
+          >
+            {websiteURL}
+          </Link>
+        </div>
       )}
 
       {githubURL && (
-        <Link
-          href={githubURL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={buttonVariants({ variant: 'outline', size: 'sm' })}
-        >
-          <GithubIcon className="mr-2" size={16} />
-          GitHub
-        </Link>
+        <div className="text-sm flex items-center">
+          <GithubIcon className="mr-2" size={14} />
+          <Link
+            href={githubURL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:underline hover:text-blue-600"
+          >
+            {githubURL}
+          </Link>
+        </div>
       )}
 
       {isOwner && (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm">
-              <Ellipsis />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuItem
-              onSelect={e => {
-                setTimeout(() => handleEdit('edit-github'), 100);
-              }}
-            >
-              Edit Github URL
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onSelect={e => {
-                setTimeout(() => handleEdit('edit-website'), 100);
-              }}
-            >
-              Edit Website URL
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="grow justify-end flex">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm">
+                <Ellipsis />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem
+                onSelect={e => {
+                  setTimeout(() => handleEdit('edit-github'), 100);
+                }}
+              >
+                Edit Github URL
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onSelect={e => {
+                  setTimeout(() => handleEdit('edit-website'), 100);
+                }}
+              >
+                Edit Website URL
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       )}
     </div>
   );

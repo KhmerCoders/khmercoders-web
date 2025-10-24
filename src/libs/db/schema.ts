@@ -284,6 +284,7 @@ export const showcase = sqliteTable('showcase', {
   alias: text('alias').notNull(),
   userId: text('user_id').notNull(),
   title: text('title').notNull(),
+  tagline: text('tagline'),
   description: text('description').notNull(),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
   updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull(),

@@ -181,12 +181,13 @@ export const getApprovedShowcasesAction = withOptionalAuthAction(async ({ db, us
 });
 
 export const updateShowcaseDescriptionAction = withAuthAction(
-  async ({ db, user }, data: { showcaseId: string; description: string }) => {
+  async ({ db, user }, data: { showcaseId: string; description?: string, tagline?: string }) => {
     try {
       // Validate input
       const inputSchema = z.object({
         showcaseId: z.string().min(1, 'Showcase ID is required'),
-        description: z.string().max(1000, 'Description is too long'),
+        description: z.optional(z.string().max(1000, 'Description is too long')),
+        tagline: z.optional(z.string().max(100, 'Tagline is too long')),
       });
 
       const validatedData = inputSchema.parse(data);
@@ -201,10 +202,14 @@ export const updateShowcaseDescriptionAction = withAuthAction(
         return { success: false, error: 'Showcase not found or you do not have permission' };
       }
 
+      if (!validatedData.description && !validatedData.tagline) {
+        return { success: false, error: 'Nothing to update' };
+      }
+
       // Update the description
       await db
         .update(schema.showcase)
-        .set({ description: validatedData.description })
+        .set({ description: validatedData.description, tagline: validatedData.tagline })
         .where(eq(schema.showcase.id, validatedData.showcaseId));
 
       return { success: true };

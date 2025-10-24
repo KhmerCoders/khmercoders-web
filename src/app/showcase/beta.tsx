@@ -92,7 +92,7 @@ export function ShowcaseBetaPage() {
                     <img
                       src={showcase.logo}
                       alt={showcase.title}
-                      className="w-24 h-24 mb-2 border border-4 border-white absolute -bottom-8 left-4"
+                      className="w-24 h-24 mb-2 border border-4 border-white absolute -bottom-8 left-4 bg-white rounded"
                     />
                   ) : (
                     <div className="w-24 h-24 mb-2 border border-4 border-white absolute -bottom-8 left-4 bg-gray-300 rounded" />
