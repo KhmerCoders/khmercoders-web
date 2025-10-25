@@ -71,9 +71,6 @@ export default function ShowcaseCreatePage() {
   const debouncedCheckAlias = useDebounce(checkAliasAvailability, 500);
 
   const handleInputChange = (field: 'name' | 'alias', value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    setErrors(prev => ({ ...prev, [field]: undefined, general: undefined }));
-
     if (field === 'alias') {
       // Convert to lowercase and replace spaces/invalid chars with hyphens
       const cleanedAlias = value
@@ -82,11 +79,12 @@ export default function ShowcaseCreatePage() {
         .replace(/-+/g, '-')
         .replace(/^-|-$/g, '');
 
-      if (cleanedAlias !== value) {
-        setFormData(prev => ({ ...prev, alias: cleanedAlias }));
-      }
-
+      setFormData(prev => ({ ...prev, alias: cleanedAlias }));
+      setErrors(prev => ({ ...prev, alias: undefined, general: undefined }));
       debouncedCheckAlias(cleanedAlias);
+    } else {
+      setFormData(prev => ({ ...prev, [field]: value }));
+      setErrors(prev => ({ ...prev, [field]: undefined, general: undefined }));
     }
   };
 
