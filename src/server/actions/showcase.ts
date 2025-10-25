@@ -276,3 +276,53 @@ export const updateShowcaseLinksAction = withAuthAction(
     ));
   }
 );
+
+export const getUserShowcasesAction = withOptionalAuthAction(
+  async ({ db, user }, targetUserId: string) => {
+    try {
+      let showcases;
+
+      if (user?.id === targetUserId) {
+        // If viewing own profile, show all showcases
+        showcases = await db.query.showcase.findMany({
+          where: (showcase, { eq }) => eq(showcase.userId, targetUserId),
+          orderBy: (showcase, { desc }) => [desc(showcase.likeCount), desc(showcase.createdAt)],
+          with: {
+            user: true,
+          }
+        });
+
+        // Bind like status for authenticated user
+        showcases = await bindingShowcaseListLikeStatus(showcases, user.id);
+      } else {
+        // If viewing someone else's profile, only show approved showcases
+        showcases = await db.query.showcase.findMany({
+          where: (showcase, { eq, and }) =>
+            and(
+              eq(showcase.userId, targetUserId),
+              eq(showcase.reviewStatus, ArticleReviewStatus.Approved)
+            ),
+          orderBy: (showcase, { desc }) => [desc(showcase.likeCount), desc(showcase.createdAt)],
+          with: {
+            user: true,
+          }
+        });
+
+        // Bind like status if user is authenticated
+        if (user?.id) {
+          showcases = await bindingShowcaseListLikeStatus(showcases, user.id);
+        }
+      }
+
+      return {
+        success: true,
+        showcases,
+      };
+    } catch (e) {
+      if (e instanceof Error) {
+        return { success: false, error: e.message };
+      }
+      return { success: false, error: 'Failed to fetch user showcases' };
+    }
+  }
+);

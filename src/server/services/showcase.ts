@@ -112,3 +112,48 @@ export async function bindingShowcaseLikeStatus(
 
   return showcase;
 }
+
+/**
+ * Get showcases for a specific user
+ * If the current user is viewing their own profile, show all showcases
+ * Otherwise, only show approved showcases
+ */
+export async function getUserShowcases(targetUserId: string, currentUserId?: string) {
+  const db = await getDB();
+
+  let showcases;
+
+  if (currentUserId === targetUserId) {
+    // If viewing own profile, show all showcases
+    showcases = await db.query.showcase.findMany({
+      where: (showcase, { eq }) => eq(showcase.userId, targetUserId),
+      orderBy: (showcase, { desc }) => [desc(showcase.likeCount), desc(showcase.createdAt)],
+      with: {
+        user: true,
+      },
+    });
+
+    // Bind like status for authenticated user
+    showcases = await bindingShowcaseListLikeStatus(showcases, currentUserId);
+  } else {
+    // If viewing someone else's profile, only show approved showcases
+    showcases = await db.query.showcase.findMany({
+      where: (showcase, { eq, and }) =>
+        and(
+          eq(showcase.userId, targetUserId),
+          eq(showcase.reviewStatus, ArticleReviewStatus.Approved)
+        ),
+      orderBy: (showcase, { desc }) => [desc(showcase.likeCount), desc(showcase.createdAt)],
+      with: {
+        user: true,
+      },
+    });
+
+    // Bind like status if user is authenticated
+    if (currentUserId) {
+      showcases = await bindingShowcaseListLikeStatus(showcases, currentUserId);
+    }
+  }
+
+  return showcases;
+}

@@ -14,6 +14,7 @@ import { ProfileExperienceListWithReview } from './profile-experience';
 import { bindingFollowerStatusFromUser } from '@/server/services/followers';
 import { getSession } from '../session';
 import { MainLayout } from '@/components/blocks/layout/MainLayout';
+import { UserShowcases } from './user-showcases';
 
 export async function generateMetadata({
   params,
@@ -124,6 +125,8 @@ export default async function UserProfilePage({
             <ProfileExperienceListWithReview experiences={experiences} />
           </div>
         </div>
+
+        <UserShowcases userId={profile.user.id} currentUserId={session?.user?.id} />
       </ProfileAiReviewProvider>
     </MainLayout>
   );

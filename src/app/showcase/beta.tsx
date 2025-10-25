@@ -1,17 +1,13 @@
 'use client';
 import { getApprovedShowcasesAction } from '@/server/actions/showcase';
-import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { ShowcaseRecord } from '@/types';
-import { getResizeImage } from '@/utils/image';
-import { useSession } from '@/components/auth-provider';
-import { ShowcaseLikeButton } from './likes';
+import { ShowcaseRow, ShowcaseSkeleton } from '@/components/showcase/ShowcaseRow';
 
 export function ShowcaseBetaPage() {
   const [showcases, setShowcases] = useState<ShowcaseRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { session } = useSession();
 
   useEffect(() => {
     const fetchShowcases = async () => {
@@ -59,69 +55,11 @@ export function ShowcaseBetaPage() {
             </>
           )}
 
-          {showcases.map(showcase => {
-            return (
-              <Link
-                key={showcase.id}
-                href={`/showcase/${showcase.alias}`}
-                className="group flex gap-2 rounded-lg overflow-hidden hover:bg-secondary transition-bg duration-200 p-4"
-              >
-                <div className="shrink-0">
-                  {showcase.logo ? (
-                    <img
-                      src={getResizeImage(showcase.logo, { width: 64, height: 64 })}
-                      alt={showcase.title}
-                      className="size-16 object-cover rounded-lg"
-                    />
-                  ) : (
-                    <div className="size-16 bg-zinc-200 dark:bg-zinc-700 rounded-lg" />
-                  )}
-                </div>
-
-                <div className="grow flex flex-col ml-2 justify-center">
-                  <h3 className="font-medium transition-colors group-hover:text-orange-500">
-                    {showcase.title}
-                  </h3>
-                  <p className="text-muted-foreground text-sm">{showcase.tagline}</p>
-                  <div className="flex items-center gap-2 mt-2">
-                    <div className="size-4 rounded-full bg-gray-300 dark:bg-gray-700" />
-                    <span className="text-xs text-muted-foreground">{showcase.user?.name}</span>
-                  </div>
-                </div>
-
-                <div className="shrink-0">
-                  <ShowcaseLikeButton
-                    resourceId={showcase.id}
-                    defaultLiked={showcase.hasCurrentUserLiked}
-                    defaultCount={showcase.likeCount}
-                  />
-                </div>
-              </Link>
-            );
-          })}
+          {showcases.map(showcase => (
+            <ShowcaseRow key={showcase.id} showcase={showcase} />
+          ))}
         </div>
       )}
-    </div>
-  );
-}
-
-function ShowcaseSkeleton() {
-  return (
-    <div>
-      <div className="animate-pulse flex gap-2 rounded-lg overflow-hidden hover:bg-secondary transition-bg duration-500 p-4">
-        <div className="shrink-0">
-          <div className="size-16 bg-zinc-200 dark:bg-zinc-700 rounded-lg" />
-        </div>
-
-        <div className="grow flex flex-col ml-2 space-y-2">
-          <div className="h-3 bg-zinc-200 dark:bg-zinc-700 rounded w-1/2 mt-2"></div>
-          <div className="h-3 bg-zinc-200 dark:bg-zinc-700 rounded w-3/4"></div>
-        </div>
-
-        <div className="shrink-0">
-          <div className="size-16 border border-2 rounded-lg bg-background flex flex-col items-center justify-center text-gray-700 dark:text-gray-200"></div>
-        </div>
-      </div>
     </div>
   );
 }
