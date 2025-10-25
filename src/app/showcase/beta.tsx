@@ -3,10 +3,11 @@
 import { buttonVariants } from '@/components/generated/button';
 import { getApprovedShowcasesAction } from '@/server/actions/showcase';
 import Link from 'next/link';
-import { LoaderIcon, Heart } from 'lucide-react';
+import { LoaderIcon, Heart, ChevronUp, Minus, ArrowBigUp } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { ShowcaseRecord } from '@/types';
 import { cn } from '@/utils';
+import { getResizeImage } from '@/utils/image';
 
 export function ShowcaseBetaPage() {
   const [showcases, setShowcases] = useState<ShowcaseRecord[]>([]);
@@ -67,41 +68,39 @@ export function ShowcaseBetaPage() {
           <p>Be the first to share your project with the community!</p>
         </div>
       ) : (
-        <div className="px-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="flex flex-col p-4">
           {showcases.map(showcase => {
-            const coverImage = showcase.coverImage.split(',')[0];
-
             return (
               <Link
                 key={showcase.id}
                 href={`/showcase/${showcase.alias}`}
-                className={cn('block', 'rounded-lg', 'border', 'overflow-hidden')}
+                className="group flex gap-2 rounded-lg overflow-hidden hover:bg-secondary transition-bg duration-200 p-4"
               >
-                <div className="w-full aspect-[2/1] bg-gray-200 relative border-b">
-                  {coverImage ? (
-                    <img
-                      src={coverImage}
-                      alt={showcase.title}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-gray-200" />
-                  )}
-
+                <div className="shrink-0">
                   {showcase.logo ? (
                     <img
-                      src={showcase.logo}
+                      src={getResizeImage(showcase.logo, { width: 64, height: 64 })}
                       alt={showcase.title}
-                      className="w-24 h-24 mb-2 border border-4 border-white absolute -bottom-8 left-4 bg-white rounded"
+                      className="size-16 object-cover rounded-lg"
                     />
                   ) : (
-                    <div className="w-24 h-24 mb-2 border border-4 border-white absolute -bottom-8 left-4 bg-gray-300 rounded" />
+                    <div className="size-16 bg-zinc-200 dark:bg-zinc-700 rounded-lg" />
                   )}
                 </div>
-                <div className="p-4 pt-8 flex flex-col">
-                  <div className="font-medium text-lg">{showcase.title}</div>
-                  <div className="flex items-center text-sm text-muted-foreground">
-                    {showcase.user?.name}
+
+                <div className="grow flex flex-col ml-2">
+                  <h3 className="font-medium transition-colors group-hover:text-orange-500">
+                    {showcase.title}
+                  </h3>
+                  <p className="text-muted-foreground text-sm mt-1">{showcase.tagline}</p>
+                </div>
+
+                <div className="shrink-0">
+                  <div className="size-16 border border-2 rounded-lg bg-background hover:border-orange-500 flex flex-col items-center justify-center text-gray-700 dark:text-gray-200">
+                    <ArrowBigUp className="w-5 h-5" />
+                    <span>
+                      <Minus className="w-4 h-4" />
+                    </span>
                   </div>
                 </div>
               </Link>
