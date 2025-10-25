@@ -45,18 +45,77 @@ export async function generateMetadata({ params }: ShowcasePageProps) {
   if (!showcase) {
     return {
       title: 'Showcase Not Found',
+      description: 'The showcase you are looking for could not be found.',
     };
   }
 
+  // Construct description with tagline and description
+  const metaDescription =
+    showcase.tagline && showcase.description
+      ? `${showcase.tagline} - ${showcase.description.slice(0, 100)}${showcase.description.length > 100 ? '...' : ''}`
+      : showcase.tagline
+        ? showcase.tagline
+        : showcase.description
+          ? showcase.description.slice(0, 160)
+          : `Check out ${showcase.title} on KhmerCoders community showcase`;
+
+  // Get the first cover image
+  const coverImageUrl = showcase.coverImage ? showcase.coverImage.split(',')[0] : showcase.logo;
+
+  // Get creator name
+  const creatorName = showcase.user?.name || 'KhmerCoders Community';
+
   return {
     title: `${showcase.title} - KhmerCoders Showcase`,
-    description:
-      showcase.description || `Check out ${showcase.title} on KhmerCoders community showcase`,
+    description: metaDescription,
+    authors: [{ name: creatorName }],
+    creator: creatorName,
+    publisher: 'KhmerCoders',
+    keywords: [
+      showcase.title,
+      'KhmerCoders',
+      'showcase',
+      'project',
+      'portfolio',
+      'Cambodia tech',
+      'Khmer developers',
+    ],
     openGraph: {
+      type: 'website',
+      locale: 'en_US',
+      url: `https://khmercoders.com/showcase/${alias}`,
       title: showcase.title,
-      description:
-        showcase.description || `Check out ${showcase.title} on KhmerCoders community showcase`,
-      images: showcase.coverImage ? [{ url: showcase.coverImage }] : undefined,
+      description: metaDescription,
+      siteName: 'KhmerCoders',
+      images: coverImageUrl
+        ? [
+            {
+              url: coverImageUrl,
+              alt: `${showcase.title} showcase image`,
+              width: 1200,
+              height: 630,
+            },
+          ]
+        : undefined,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: showcase.title,
+      description: metaDescription,
+      images: coverImageUrl ? [coverImageUrl] : undefined,
+      creator: '@KhmerCoders',
+      site: '@KhmerCoders',
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
     },
   };
 }
