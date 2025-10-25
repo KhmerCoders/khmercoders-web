@@ -10,6 +10,9 @@ import { MessageSquareShare } from 'lucide-react';
 export const metadata: Metadata = {
   title: 'Community Metrics | Khmer Coders',
   description: 'Engagement metrics for the Khmer Coders community on Telegram and Discord',
+  alternates: {
+    canonical: `${process.env.NEXT_PUBLIC_BASE_URL}/community`,
+  },
 };
 
 export default async function CommunityPage() {

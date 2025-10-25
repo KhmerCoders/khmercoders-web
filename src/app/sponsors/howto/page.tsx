@@ -1,4 +1,13 @@
 import { MainLayout } from '@/components/blocks/layout/MainLayout';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'How to Sponsor Us | Khmer Coders',
+  description: 'Learn how to become a sponsor and support the Khmer Coders community.',
+  alternates: {
+    canonical: `${process.env.NEXT_PUBLIC_BASE_URL}/sponsors/howto`,
+  },
+};
 
 export default function SponsorHowToPage() {
   return (

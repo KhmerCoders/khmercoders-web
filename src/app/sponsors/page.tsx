@@ -13,6 +13,15 @@ import { eventsDatabase } from '@/data/events';
 import Link from 'next/link';
 import { StackNavigation } from '@/components/blocks/layout/StackNavigation';
 import { Package } from 'lucide-react';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Sponsors | Khmer Coders',
+  description: 'Our generous sponsors and partners who support the Khmer Coders community.',
+  alternates: {
+    canonical: `${process.env.NEXT_PUBLIC_BASE_URL}/sponsors`,
+  },
+};
 
 export default function SponsorPage() {
   return (

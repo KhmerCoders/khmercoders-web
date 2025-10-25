@@ -13,6 +13,9 @@ export const metadata: Metadata = {
   title: 'Our Teams | Khmer Coders',
   description:
     "Meet the founding members, volunteers, and community moderators of Khmer Coders, Cambodia's largest coding community.",
+  alternates: {
+    canonical: `${process.env.NEXT_PUBLIC_BASE_URL}/teams`,
+  },
 };
 
 export default async function TeamsPage() {

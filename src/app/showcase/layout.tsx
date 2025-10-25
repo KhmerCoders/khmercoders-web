@@ -15,6 +15,9 @@ export const metadata: Metadata = {
     'developer showcase',
     'tech community',
   ],
+  alternates: {
+    canonical: `${process.env.NEXT_PUBLIC_BASE_URL}/showcase`,
+  },
   openGraph: {
     type: 'website',
     locale: 'en_US',

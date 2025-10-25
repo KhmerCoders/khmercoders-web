@@ -30,6 +30,9 @@ export async function generateMetadata({
     description:
       profile.member_profile.bio?.substring(0, 160) ||
       `${profile.user.name} is a member of Khmer Coders, Cambodia's largest coding community.`,
+    alternates: {
+      canonical: `${process.env.NEXT_PUBLIC_BASE_URL}/@${profile.member_profile.alias}`,
+    },
     openGraph: {
       title: `${profile.user.name} | Khmer Coders`,
       description:

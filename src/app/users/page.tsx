@@ -12,6 +12,15 @@ import {
 } from '@/components/generated/pagination';
 import { getUserCount, getUserList } from '@/server/services/users';
 import Link from 'next/link';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Users | Khmer Coders',
+  description: "Browse and connect with developers in Cambodia's largest coding community.",
+  alternates: {
+    canonical: `${process.env.NEXT_PUBLIC_BASE_URL}/users`,
+  },
+};
 
 interface UserPageProps {
   searchParams: {
