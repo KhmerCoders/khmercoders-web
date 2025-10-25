@@ -54,7 +54,7 @@ export function ShowcaseLikeButton({
   );
 
   const className = cn(
-    'size-16 border border-2 rounded-lg bg-background flex flex-col items-center justify-center transition-colors',
+    'size-14 border border-2 rounded-lg bg-background flex flex-col items-center justify-center transition-colors',
     !liked && 'text-gray-700 dark:text-gray-200 hover:border-orange-500',
     liked && 'border-orange-500 text-orange-500 bg-orange-500/10'
   );

@@ -37,7 +37,9 @@ export function ShowcaseHeader() {
         <ShowcaseLogo />
         <div className="flex flex-col justify-center">
           <div className="font-semibold text-lg">{showcase.title}</div>
-          <div className="text-muted-foreground">{showcase.tagline || 'No tagline available'}</div>
+          <div className="text-muted-foreground line-clamp-3">
+            {showcase.tagline || 'No tagline available'}
+          </div>
         </div>
         {isOwner && (
           <div className="grow justify-end flex">

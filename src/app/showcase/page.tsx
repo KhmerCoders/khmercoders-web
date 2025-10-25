@@ -21,7 +21,7 @@ export default function ShowcasePage() {
               href="/showcase/create"
               className={buttonVariants({ variant: 'default', size: 'sm' })}
             >
-              Add Showcase
+              Create
             </Link>
           )
         }
