@@ -6,6 +6,7 @@ import { ArticleReviewStatus } from '@/types';
 import { z } from 'zod';
 import { and, eq } from 'drizzle-orm';
 import { syncUploadFilesToResource } from '../services/upload';
+import { bindingShowcaseListLikeStatus } from '../services/showcase';
 
 const createShowcaseSchema = z.object({
   name: z.string().min(1, 'Project name is required').max(100, 'Project name is too long'),
@@ -152,16 +153,19 @@ export const getApprovedShowcasesAction = withOptionalAuthAction(async ({ db, us
       showcases = await db.query.showcase.findMany({
         where: (showcase, { eq, or }) =>
           or(eq(showcase.reviewStatus, ArticleReviewStatus.Approved), eq(showcase.userId, user.id)),
-        orderBy: (showcase, { desc }) => [desc(showcase.createdAt)],
+        orderBy: (showcase, { desc }) => [desc(showcase.likeCount), desc(showcase.createdAt)],
         with: {
           user: true,
         }
       });
+
+      // Bind like status for all showcases in a single optimized query
+      showcases = await bindingShowcaseListLikeStatus(showcases, user.id);
     } else {
       // For unauthenticated users, only get approved showcases
       showcases = await db.query.showcase.findMany({
         where: (showcase, { eq }) => eq(showcase.reviewStatus, ArticleReviewStatus.Approved),
-        orderBy: (showcase, { desc }) => [desc(showcase.createdAt)],
+        orderBy: (showcase, { desc }) => [desc(showcase.likeCount), desc(showcase.createdAt)],
         with: {
           user: true,
         }

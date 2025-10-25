@@ -1,11 +1,11 @@
 'use client';
 import { getApprovedShowcasesAction } from '@/server/actions/showcase';
 import Link from 'next/link';
-import { Minus, ArrowBigUp } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { ShowcaseRecord } from '@/types';
 import { getResizeImage } from '@/utils/image';
 import { useSession } from '@/components/auth-provider';
+import { ShowcaseLikeButton } from './likes';
 
 export function ShowcaseBetaPage() {
   const [showcases, setShowcases] = useState<ShowcaseRecord[]>([]);
@@ -90,12 +90,11 @@ export function ShowcaseBetaPage() {
                 </div>
 
                 <div className="shrink-0">
-                  <div className="size-16 border border-2 rounded-lg bg-background hover:border-orange-500 flex flex-col items-center justify-center text-gray-700 dark:text-gray-200">
-                    <ArrowBigUp className="w-5 h-5" />
-                    <span>
-                      <Minus className="w-4 h-4" />
-                    </span>
-                  </div>
+                  <ShowcaseLikeButton
+                    resourceId={showcase.id}
+                    defaultLiked={showcase.hasCurrentUserLiked}
+                    defaultCount={showcase.likeCount}
+                  />
                 </div>
               </Link>
             );

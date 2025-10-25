@@ -37,7 +37,7 @@ export enum UserLevel {
 }
 
 export type BindingResourceType = 'profile' | 'article' | 'showcase' | 'showcase-banner';
-export type LikableResourceType = 'article' | 'post';
+export type LikableResourceType = 'article' | 'post' | 'showcase';
 export type PostableResourceType = 'article' | 'post';
 
 export type MainDatabase = DrizzleD1Database<typeof schema>;
@@ -100,9 +100,9 @@ export type ShowcaseRecord = typeof schema.showcase.$inferSelect & {
 export type FeedRecord = (
   | { type: 'article'; data: ArticlePreviewRecord }
   | {
-      type: 'post';
-      data: PostRecordWithProfile;
-    }
+    type: 'post';
+    data: PostRecordWithProfile;
+  }
 ) & {
   createdAt: Date;
   id: string;

@@ -150,3 +150,71 @@ export const unlikePostAction = withAuthAction(async ({ db, user }, postId: stri
 
   return likeStats[0]?.count ?? null;
 });
+
+export const likeShowcaseAction = withAuthAction(async ({ db, user }, showcaseId: string) => {
+  // Check if it is valid showcase ID
+  const showcase = await db.query.showcase.findFirst({
+    where: eq(schema.showcase.id, showcaseId),
+  });
+
+  if (!showcase) {
+    throw new Error('Showcase not found or invalid showcase ID.');
+  }
+
+  const [_, likeStats] = await db.batch([
+    db
+      .insert(schema.likes)
+      .values({
+        userId: user.id,
+        resourceId: showcaseId,
+        type: 'showcase',
+        createdAt: new Date(),
+      })
+      .onConflictDoNothing(),
+    db
+      .update(schema.showcase)
+      .set({
+        likeCount: sql`${schema.showcase.likeCount} + 1`,
+      })
+      .where(and(eq(schema.showcase.id, showcaseId), sql`changes() > 0`))
+      .returning({
+        count: schema.showcase.likeCount,
+      }),
+  ]);
+
+  return likeStats[0]?.count ?? null;
+});
+
+export const unlikeShowcaseAction = withAuthAction(async ({ db, user }, showcaseId: string) => {
+  // Check if it is valid showcase ID
+  const showcase = await db.query.showcase.findFirst({
+    where: eq(schema.showcase.id, showcaseId),
+  });
+
+  if (!showcase) {
+    throw new Error('Showcase not found or invalid showcase ID.');
+  }
+
+  const [_, likeStats] = await db.batch([
+    db
+      .delete(schema.likes)
+      .where(
+        and(
+          eq(schema.likes.resourceId, showcaseId),
+          eq(schema.likes.userId, user.id),
+          eq(schema.likes.type, 'showcase')
+        )
+      ),
+    db
+      .update(schema.showcase)
+      .set({
+        likeCount: sql`${schema.showcase.likeCount} - 1`,
+      })
+      .where(and(eq(schema.showcase.id, showcaseId), sql`changes() > 0`))
+      .returning({
+        count: schema.showcase.likeCount,
+      }),
+  ]);
+
+  return likeStats[0]?.count ?? null;
+});
