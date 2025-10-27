@@ -113,7 +113,6 @@ export function FeedItem({ feed, isReply = false }: { feed: FeedRecord; isReply?
         {showReplies && !isReply && (
           <ReplyList
             parentPostId={post.id}
-            replies={[]}
             onReplyCreated={() => setCommentCount(prev => prev + 1)}
           />
         )}
