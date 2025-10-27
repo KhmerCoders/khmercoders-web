@@ -7,6 +7,7 @@ import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { sortExperience } from '@/utils/experience';
 import z from 'zod';
 import { ProfileAiReviewFeedback } from '@/types';
+import { revalidatePath } from 'next/cache';
 
 export const getUserAction = withAuthAction(async ({ user }) => {
   return user;
@@ -76,7 +77,7 @@ export const updateUserAliasAction = withAuthAction(
         message: 'Failed to update alias. Please try again later.',
       };
     }
-
+    revalidatePath(`/@${normalizedAlias}`);
     return {
       success: true,
       message: 'Alias updated successfully.',
@@ -178,7 +179,7 @@ export const updateUserProfileAction = withAuthAction(
 
       return {
         success: true,
-        message: 'Profile updated successfully.',
+        message: 'Profile updated successfully.'
       };
     } catch (error) {
       console.error('Failed to update profile:', error);
