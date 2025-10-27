@@ -10,8 +10,8 @@ import {
   getRepliesAction,
   createReplyAction,
   deleteReplyAction,
-  checkContentModeration,
 } from '@/server/actions/post';
+import { checkContentModeration } from '@/libs/utils/moderation';
 import { useSession } from '@/components/auth-provider';
 import { toast } from 'sonner';
 

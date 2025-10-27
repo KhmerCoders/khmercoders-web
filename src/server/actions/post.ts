@@ -215,7 +215,7 @@ export const getRepliesAction = withOptionalAuthAction(
  * This can be extended with AI moderation, keyword filtering, etc.
  * Returns true if content is acceptable, false if it should be flagged.
  */
-export function checkContentModeration(content: string): {
+function checkContentModeration(content: string): {
   approved: boolean;
   reason?: string;
 } {
