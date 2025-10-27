@@ -157,3 +157,25 @@ export async function getUserShowcases(targetUserId: string, currentUserId?: str
 
   return showcases;
 }
+
+export async function getRandomApprovedShowcase() {
+  const db = await getDB();
+
+  const showcase = await db.query.showcase.findFirst({
+    where: (showcase, { eq, and, sql }) =>
+      and(
+        eq(showcase.reviewStatus, ArticleReviewStatus.Approved),
+        sql`coalesce(${showcase.logo}, '') <> ''`
+      ),
+    orderBy: (_, { sql }) => [sql`RANDOM()`],
+    with: {
+      user: {
+        with: {
+          profile: true,
+        },
+      },
+    },
+  });
+
+  return showcase;
+}
