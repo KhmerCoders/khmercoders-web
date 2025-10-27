@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { getShowcaseByAlias } from '@/server/services/showcase';
+import { bindingShowcaseLikeStatus, getShowcaseByAlias } from '@/server/services/showcase';
 import { MainLayout } from '@/components/blocks/layout/MainLayout';
 import { StackNavigation } from '@/components/blocks/layout/StackNavigation';
 import { ShowcaseDescription } from './description';
@@ -7,6 +7,7 @@ import { ShowcaseProvider } from './provider';
 import { ShowcaseMediaSection } from './media';
 import { ShowcaseLinkSection } from './link';
 import { ShowcaseHeader } from './header';
+import { getSession } from '@/app/session';
 
 interface ShowcasePageProps {
   params: Promise<{
@@ -16,6 +17,7 @@ interface ShowcasePageProps {
 
 export default async function ShowcasePage({ params }: ShowcasePageProps) {
   const { alias } = await params;
+  const { session } = await getSession();
 
   const showcase = await getShowcaseByAlias(alias);
 
@@ -24,13 +26,15 @@ export default async function ShowcasePage({ params }: ShowcasePageProps) {
     notFound();
   }
 
+  const bindedShowcase = await bindingShowcaseLikeStatus(showcase, session?.user?.id);
+
   return (
     <MainLayout hideRightNav>
-      <ShowcaseProvider showcase={showcase}>
+      <ShowcaseProvider showcase={bindedShowcase}>
         <StackNavigation defaultBackURL="/showcase" />
         <ShowcaseHeader />
         <ShowcaseLinkSection />
-        <ShowcaseDescription showcase={showcase} />
+        <ShowcaseDescription showcase={bindedShowcase} />
         <ShowcaseMediaSection />
       </ShowcaseProvider>
     </MainLayout>

@@ -48,7 +48,7 @@ export async function bindingShowcaseListLikeStatus(
 /**
  * Get a showcase by its alias with user and profile information
  */
-export async function getShowcaseByAlias(alias: string) {
+export async function getShowcaseByAlias(alias: string): Promise<ShowcaseRecord | undefined> {
   const db = await getDB();
 
   const showcase = await db.query.showcase.findFirst({
