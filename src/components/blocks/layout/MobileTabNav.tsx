@@ -21,7 +21,7 @@ export function MobileTabNavigation() {
         <Link className={tabButtonClass} href="/mobile-search">
           <SearchIcon />
         </Link>
-        <Link className={tabButtonClass} href="/mobile-showcase" aria-label="Showcase">
+        <Link className={tabButtonClass} href="/showcase" aria-label="Showcase">
           <TvMinimal />
         </Link>
         <Link className={tabButtonClass} href="/mobile-post">
