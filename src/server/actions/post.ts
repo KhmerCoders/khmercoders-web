@@ -1,7 +1,7 @@
 'use server';
 
-import { PostableResourceType, PostRecord, PostRecordWithProfile } from '@/types';
-import { withAuthAction } from './middleware';
+import { PostableResourceType, PostRecordWithProfile } from '@/types';
+import { withAuthAction, withOptionalAuthAction } from './middleware';
 import * as schema from './../../libs/db/schema';
 import { generatePostId } from '../generate-id';
 import { eq, sql } from 'drizzle-orm';
@@ -95,5 +95,117 @@ export const createPostAction = withAuthAction(
       success: true,
       result: post,
     };
+  }
+);
+
+export const createReplyAction = withAuthAction(
+  async (
+    { db, user },
+    parentPostId: string,
+    content: string
+  ): Promise<{ success: boolean; result?: PostRecordWithProfile; error?: string }> => {
+    if (!content || content.trim() === '') {
+      return {
+        success: false,
+        error: 'Reply content cannot be empty',
+      };
+    }
+
+    if (content.length > POST_CHARACTER_LIMIT) {
+      return {
+        success: false,
+        error: `Reply content exceeds the limit of ${POST_CHARACTER_LIMIT} characters`,
+      };
+    }
+
+    // Check if parent post exists
+    const parentPost = await db.query.posts.findFirst({
+      where: (posts, { eq }) => eq(posts.id, parentPostId),
+    });
+
+    if (!parentPost) {
+      return {
+        success: false,
+        error: 'Parent post not found',
+      };
+    }
+
+    const replyId = generatePostId();
+
+    // Create the reply and increment reply count on parent post
+    await db.batch([
+      db.insert(schema.posts).values({
+        id: replyId,
+        userId: user.id,
+        content,
+        parentPostId,
+        resourceType: 'post',
+        resourceId: null,
+        likeCount: 0,
+        commentCount: 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }),
+      db
+        .update(schema.posts)
+        .set({
+          commentCount: sql`${schema.posts.commentCount} + 1`,
+        })
+        .where(eq(schema.posts.id, parentPostId)),
+    ]);
+
+    const reply = await db.query.posts.findFirst({
+      where: (posts, { eq }) => eq(posts.id, replyId),
+      with: {
+        user: {
+          with: {
+            profile: true,
+          },
+        },
+      },
+    });
+
+    if (!reply) {
+      return {
+        success: false,
+        error: 'Failed to create reply',
+      };
+    }
+
+    return {
+      success: true,
+      result: reply,
+    };
+  }
+);
+
+export const getRepliesAction = withOptionalAuthAction(
+  async (
+    { db },
+    parentPostId: string
+  ): Promise<{ success: boolean; data?: PostRecordWithProfile[]; error?: string }> => {
+    try {
+      const replies = await db.query.posts.findMany({
+        where: (posts, { eq }) => eq(posts.parentPostId, parentPostId),
+        with: {
+          user: {
+            with: {
+              profile: true,
+            },
+          },
+        },
+        orderBy: (posts, { asc }) => [asc(posts.createdAt)],
+      });
+
+      return {
+        success: true,
+        data: replies as PostRecordWithProfile[],
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: 'Failed to fetch replies',
+      };
+    }
   }
 );

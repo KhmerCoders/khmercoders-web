@@ -1,15 +1,30 @@
+'use client';
+
 import { TooltipContent, TooltipTrigger } from '@/components/generated/tooltip';
 import { CommentButton, LikeButton } from '@/components/interaction-button';
 import { MarkdownContent } from '@/components/MarkdownContent';
-import { ArticlePreviewRecord, FeedRecord, UserRecordWithProfile } from '@/types';
+import {
+  ArticlePreviewRecord,
+  FeedRecord,
+  UserRecordWithProfile,
+  PostRecordWithProfile,
+} from '@/types';
 import { formatAgo } from '@/utils/format';
 import { getResizeImage } from '@/utils/image';
 import { Tooltip } from '@radix-ui/react-tooltip';
 import { Eye } from 'lucide-react';
 import Link from 'next/link';
-import { PropsWithChildren } from 'react';
+import { PropsWithChildren, useState } from 'react';
+import { useSession } from '@/components/auth-provider';
+import { ReplyList } from './ReplyList';
 
-export function FeedItem({ feed }: { feed: FeedRecord }) {
+export function FeedItem({ feed, isReply = false }: { feed: FeedRecord; isReply?: boolean }) {
+  const { session } = useSession();
+  const [showReplies, setShowReplies] = useState(false);
+  const [commentCount, setCommentCount] = useState<number>(
+    feed.type === 'post' ? (feed.data as PostRecordWithProfile).commentCount : 0
+  );
+
   if (feed.type === 'article') {
     return (
       <FeedPostWrapper
@@ -52,24 +67,57 @@ export function FeedItem({ feed }: { feed: FeedRecord }) {
       </FeedPostWrapper>
     );
   } else if (feed.type === 'post') {
+    const post = feed.data as PostRecordWithProfile;
+
     return (
-      <FeedPostWrapper
-        user={feed.data.user}
-        createdAt={feed.data.createdAt}
-        label={feed.data.resourceType === 'article' ? 'commented' : ''}
-      >
-        <div className="markdown">
-          <MarkdownContent withoutMedia>{feed.data.content}</MarkdownContent>
-        </div>
-        <div className="flex gap-2">
-          <LikeButton
-            defaultCount={feed.data.likeCount}
-            defaultLiked={feed.data.hasCurrentUserLiked}
-            resourceId={feed.data.id}
-            resourceType="post"
+      <div>
+        <FeedPostWrapper
+          user={post.user}
+          createdAt={post.createdAt}
+          label={post.resourceType === 'article' ? 'commented' : ''}
+          isReply={isReply}
+        >
+          <div className="markdown">
+            <MarkdownContent withoutMedia>{post.content}</MarkdownContent>
+          </div>
+          <div className="flex gap-2">
+            <LikeButton
+              defaultCount={post.likeCount}
+              defaultLiked={post.hasCurrentUserLiked}
+              resourceId={post.id}
+              resourceType="post"
+            />
+
+            {/* Reply button - always show for logged-in users on non-reply posts */}
+            {!isReply && session?.user && (
+              <button
+                type="button"
+                onClick={() => setShowReplies(!showReplies)}
+                aria-expanded={showReplies}
+                className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {commentCount > 0 ? (
+                  <>
+                    {commentCount} {commentCount === 1 ? 'reply' : 'replies'}{' '}
+                    {showReplies ? '▲' : '▼'}
+                  </>
+                ) : (
+                  <>reply {showReplies ? '▲' : '▼'}</>
+                )}
+              </button>
+            )}
+          </div>
+        </FeedPostWrapper>
+
+        {/* Show replies if toggled */}
+        {showReplies && !isReply && (
+          <ReplyList
+            parentPostId={post.id}
+            replies={[]}
+            onReplyCreated={() => setCommentCount(prev => prev + 1)}
           />
-        </div>
-      </FeedPostWrapper>
+        )}
+      </div>
     );
   }
 
@@ -104,9 +152,15 @@ function FeedPostWrapper({
   label,
   children,
   createdAt,
-}: PropsWithChildren<{ user?: UserRecordWithProfile; label: string; createdAt: Date }>) {
+  isReply = false,
+}: PropsWithChildren<{
+  user?: UserRecordWithProfile;
+  label: string;
+  createdAt: Date;
+  isReply?: boolean;
+}>) {
   return (
-    <div className="p-4 border-b flex gap-2 w-full">
+    <div className={`p-4 border-b flex gap-2 w-full ${isReply ? 'bg-muted/20' : ''}`}>
       <div className="shrink-0">
         <Link href={`/@${user?.profile?.alias}`}>
           <img src={user?.image ?? ''} alt={user?.name} className="w-12 h-12 rounded-full" />
