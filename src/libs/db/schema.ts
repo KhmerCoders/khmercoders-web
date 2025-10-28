@@ -245,6 +245,7 @@ export const posts = sqliteTable(
     commentCount: integer('comment_count').notNull().default(0),
     resourceType: text('resource_type').notNull().$type<PostableResourceType>(),
     resourceId: text('resource_id'),
+    parentPostId: text('parent_post_id'), // For nested replies to comments
     createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
     updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull(),
   },
@@ -252,6 +253,7 @@ export const posts = sqliteTable(
     // Indexing for faster lookups + sorting by createdAt
     index('posts_user_id_idx').on(table.userId, table.createdAt),
     index('posts_resource_type_idx').on(table.resourceType, table.resourceId),
+    index('posts_parent_post_id_idx').on(table.parentPostId),
   ]
 );
 
@@ -329,8 +331,14 @@ export const articleRelationship = relations(article, ({ one }) => ({
   user: one(user, { fields: [article.userId], references: [user.id] }),
 }));
 
-export const postRelationship = relations(posts, ({ one }) => ({
+export const postRelationship = relations(posts, ({ one, many }) => ({
   user: one(user, { fields: [posts.userId], references: [user.id] }),
+  replies: many(posts, { relationName: 'replies' }),
+  parentPost: one(posts, {
+    fields: [posts.parentPostId],
+    references: [posts.id],
+    relationName: 'replies',
+  }),
 }));
 
 export const showcaseRelationship = relations(showcase, ({ one }) => ({

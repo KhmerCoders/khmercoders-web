@@ -58,6 +58,10 @@ export type PostRecordWithProfile = PostRecord & {
   user: UserRecordWithProfile;
 };
 
+export type PostRecordWithReplies = PostRecordWithProfile & {
+  replies?: PostRecordWithProfile[];
+};
+
 export type ProfileRecord = typeof schema.memberProfile.$inferSelect;
 export type ProfileAiReviewFeedback = {
   rating: number;
@@ -100,9 +104,9 @@ export type ShowcaseRecord = typeof schema.showcase.$inferSelect & {
 export type FeedRecord = (
   | { type: 'article'; data: ArticlePreviewRecord }
   | {
-    type: 'post';
-    data: PostRecordWithProfile;
-  }
+      type: 'post';
+      data: PostRecordWithProfile;
+    }
 ) & {
   createdAt: Date;
   id: string;

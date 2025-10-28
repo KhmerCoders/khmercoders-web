@@ -5,10 +5,7 @@ import { produce } from 'immer';
 /**
  * Bind like status to a list of showcases for a specific user (optimized batch query)
  */
-export async function bindingShowcaseListLikeStatus(
-  showcases: ShowcaseRecord[],
-  userId?: string
-) {
+export async function bindingShowcaseListLikeStatus(showcases: ShowcaseRecord[], userId?: string) {
   if (!userId) {
     return showcases;
   }
