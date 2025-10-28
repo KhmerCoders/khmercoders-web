@@ -156,7 +156,7 @@ export const getApprovedShowcasesAction = withOptionalAuthAction(async ({ db, us
         orderBy: (showcase, { desc }) => [desc(showcase.likeCount), desc(showcase.createdAt)],
         with: {
           user: true,
-        }
+        },
       });
 
       // Bind like status for all showcases in a single optimized query
@@ -168,7 +168,7 @@ export const getApprovedShowcasesAction = withOptionalAuthAction(async ({ db, us
         orderBy: (showcase, { desc }) => [desc(showcase.likeCount), desc(showcase.createdAt)],
         with: {
           user: true,
-        }
+        },
       });
     }
 
@@ -185,7 +185,7 @@ export const getApprovedShowcasesAction = withOptionalAuthAction(async ({ db, us
 });
 
 export const updateShowcaseDescriptionAction = withAuthAction(
-  async ({ db, user }, data: { showcaseId: string; description?: string, tagline?: string }) => {
+  async ({ db, user }, data: { showcaseId: string; description?: string; tagline?: string }) => {
     try {
       // Validate input
       const inputSchema = z.object({
@@ -263,17 +263,14 @@ export const updateShowcaseCoverImageAction = withAuthAction(
 );
 
 export const updateShowcaseLinksAction = withAuthAction(
-  async (
-    { db, user },
-    data: { showcaseId: string; github?: string; website?: string }
-  ) => {
-    await db.update(schema.showcase).set({
-      github: data.github,
-      website: data.website,
-    }).where(and(
-      eq(schema.showcase.id, data.showcaseId),
-      eq(schema.showcase.userId, user.id)
-    ));
+  async ({ db, user }, data: { showcaseId: string; github?: string; website?: string }) => {
+    await db
+      .update(schema.showcase)
+      .set({
+        github: data.github,
+        website: data.website,
+      })
+      .where(and(eq(schema.showcase.id, data.showcaseId), eq(schema.showcase.userId, user.id)));
   }
 );
 
@@ -289,7 +286,7 @@ export const getUserShowcasesAction = withOptionalAuthAction(
           orderBy: (showcase, { desc }) => [desc(showcase.likeCount), desc(showcase.createdAt)],
           with: {
             user: true,
-          }
+          },
         });
 
         // Bind like status for authenticated user
@@ -305,7 +302,7 @@ export const getUserShowcasesAction = withOptionalAuthAction(
           orderBy: (showcase, { desc }) => [desc(showcase.likeCount), desc(showcase.createdAt)],
           with: {
             user: true,
-          }
+          },
         });
 
         // Bind like status if user is authenticated

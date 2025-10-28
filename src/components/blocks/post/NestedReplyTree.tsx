@@ -6,11 +6,7 @@ import { FeedItem } from './FeedItem';
 import { ReplyEditor } from './ReplyEditor';
 import { Button } from '@/components/generated/button';
 import { MessageCircle, Loader, ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
-import {
-  getRepliesAction,
-  createReplyAction,
-  deleteReplyAction,
-} from '@/server/actions/post';
+import { getRepliesAction, createReplyAction, deleteReplyAction } from '@/server/actions/post';
 import { checkContentModeration } from '@/libs/utils/moderation';
 import { useSession } from '@/components/auth-provider';
 import { toast } from 'sonner';
