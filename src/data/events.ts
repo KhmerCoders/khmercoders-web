@@ -7,8 +7,8 @@ interface EventAgendaGroup {
 
 interface EventAgendaData {
   time: string;
-  topic: string;
-  by?: string[];
+  topic?: string;
+  by?: string;
 }
 
 export interface EventData {
@@ -171,64 +171,128 @@ export const eventsDatabase: EventData[] = [
           {
             time: '2:00 – 2:30 PM',
             topic: 'Registration & Welcome Coffee',
+            by: 'Sopha Sum',
           },
         ],
       },
+
       {
         data: [
           {
             time: '2:30 – 2:45 PM',
             topic: 'Opening Remarks • Representatives from Founder of Khmer Coders Community',
+            by: 'Sopha Sum',
           },
         ],
       },
+
       {
         data: [
           {
             time: '2:45 – 4:30 PM',
-            topic:
-              'Individual Presentations (20 to 30 mins each and Q&A) • Daisuke Komatsubara – Trends in AI Agent Development • Takeshi Izuka – AI and Future of Work • Vor Sokhna – AI Applications in Cambodia’s Enterprises • In Visal – Coding Culture and Developer Ecosystem in Cambodia • Buoy Rina – Building Human-Centered AI • Sreang Rantanak – Bridging AI Research and Real-World Applications',
+            topic: 'Trends in AI Agent Development',
+            by: 'Daisuke Komatsubara',
           },
         ],
       },
+
+      {
+        data: [
+          {
+            time: "",
+            topic: 'AI and Future of Work',
+            by: 'Takeshi Izuka',
+          },
+        ],
+      },
+
+      {
+        data: [
+          {
+            time: "",
+            topic: 'AI Applications in Cambodia’s Enterprises',
+            by: 'Vor Sokhna',
+          },
+        ],
+      },
+
+      {
+        data: [
+          {
+            time: "",
+            topic: 'Coding Culture and Developer Ecosystem in Cambodia',
+            by: 'In Visal',
+          },
+        ],
+      },
+
+      {
+        data: [
+          {
+            time: "",
+            topic: 'Building Human-Centered AI',
+            by: 'Buoy Rina',
+          },
+        ],
+      },
+
+      {
+        data: [
+          {
+            time: "",
+            topic: 'Bridging AI Research and Real-World Applications',
+            by: 'Sreang Rantanak',
+          },
+        ],
+      },
+
       {
         data: [
           {
             time: '4:30 – 5:15 PM',
             topic:
               'Panel Discussion: “AI Agents & Coding for the Next Decade” Moderated by Sum Sopha',
+            by: 'Sopha Sum',
           },
         ],
       },
+
       {
         data: [
           {
             time: '5:15 – 5:30 PM',
             topic: 'Coffee Break & Group Photo & Networking',
+            by: 'Sopha Sum',
           },
         ],
       },
+
       {
         data: [
           {
             time: '5:30 – 7:00 PM',
             topic: 'Showcase Session • Startup demos, AI agent showcases, and coding projects ',
+            by: 'Sopha Sum',
           },
         ],
       },
+
       {
         data: [
           {
             time: '7:00 – 7:30 PM',
             topic: 'Sponsors Speech and Closing Remarks',
+            by: 'Sopha Sum',
           },
         ],
       },
+
       {
         data: [
           {
             time: '7:39 – 9:00 PM',
             topic: 'Evening Party & Networking • Informal gathering with music, food, and drinks ',
+            by: 'Sopha Sum',
           },
         ],
       },

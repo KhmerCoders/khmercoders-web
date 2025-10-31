@@ -104,24 +104,25 @@ export default async function EventDetailPage({ params }: { params: { alias: str
           <Table>
             <TableHeader className="bg-secondary">
               <TableRow>
-                <TableHead>Activity</TableHead>
                 <TableHead>Time</TableHead>
+                <TableHead>Activity</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {event.agenda.map(section =>
+              {(event.agenda ?? []).map(section =>
                 section.data.map((item, i) => (
                   <TableRow key={`${section.title}-${i}`}>
-                    <TableCell>{item.time}</TableCell>
-                    <TableCell>{item.topic}</TableCell>
+                    <TableCell className='w-[150px]'>{item.time}</TableCell>
+                    <TableCell>
+                      <p><strong>{item.topic}</strong></p>
+                      <p>{item.by}</p>
+                    </TableCell>
                   </TableRow>
                 ))
               )}
             </TableBody>
           </Table>
         </div>
-        <br></br>
-        <p>Moderated by {event.by}</p>
       </div>
       <div className="p-4 border-t">
         <h1 className="font-bold mb-4">Sponsors</h1>
@@ -141,7 +142,7 @@ export default async function EventDetailPage({ params }: { params: { alias: str
                   <TableRow key={sponsor.id}>
                     <TableCell>
                       <div className="w-16 h-16 rounded-full overflow-hidden bg-black-secondary flex items-center justify-center">
-                        <img src={sponsor.logo}></img>
+                        <img alt={sponsor.name} title={sponsor.name} src={sponsor.logo}></img>
                       </div>
                     </TableCell>
                     <TableCell className="font-bold">{sponsor.name}</TableCell>
