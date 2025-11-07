@@ -25,7 +25,7 @@ export function ShowcaseLogo() {
 
   return (
     <div
-      onClick={handleUpdate}
+      onClick={isOwner ? handleUpdate : undefined}
       className={cn('w-16 h-16 rounded bg-gray-500 shrink-0', isOwner && 'cursor-pointer')}
     >
       {logo && (

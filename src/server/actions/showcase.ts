@@ -234,6 +234,16 @@ export const updateShowcaseDescriptionAction = withAuthAction(
 
 export const updateShowcaseLogoAction = withAuthAction(
   async ({ db, user }, data: { showcaseId: string; logo: string }) => {
+    // Check if showcase belong to the user
+    const showcase = await db.query.showcase.findFirst({
+      where: (showcase, { eq }) =>
+        and(eq(showcase.id, data.showcaseId), eq(showcase.userId, user.id)),
+    });
+
+    if (!showcase) {
+      throw new Error('Showcase not found or you do not have permission to update it');
+    }
+
     // Making sure the logo is a valid URL and belong to current user as well
     await syncUploadFilesToResource(user.id, [data.logo], 'showcase', data.showcaseId);
 
@@ -249,6 +259,16 @@ export const updateShowcaseLogoAction = withAuthAction(
 
 export const updateShowcaseCoverImageAction = withAuthAction(
   async ({ db, user }, data: { showcaseId: string; coverImage: string[] }) => {
+    // Check if showcase belong to the user
+    const showcase = await db.query.showcase.findFirst({
+      where: (showcase, { eq }) =>
+        and(eq(showcase.id, data.showcaseId), eq(showcase.userId, user.id)),
+    });
+
+    if (!showcase) {
+      throw new Error('Showcase not found or you do not have permission to update it');
+    }
+
     // Making sure the cover image is a valid URL and belong to current user as well
     await syncUploadFilesToResource(user.id, data.coverImage, 'showcase-banner', data.showcaseId);
 
