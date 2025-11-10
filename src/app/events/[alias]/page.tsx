@@ -15,6 +15,8 @@ import {
   TableRow,
 } from '@/components/generated/table';
 import { StackNavigation } from '@/components/blocks/layout/StackNavigation';
+import { title } from 'process';
+import { time } from 'console';
 
 export async function generateMetadata({
   params,
@@ -96,7 +98,34 @@ export default async function EventDetailPage({ params }: { params: { alias: str
 
         <p className="mt-4">{event.description}</p>
       </div>
-
+      <div className="p-4 border-t">
+        <h1 className="font-bold mb-4">Agenda</h1>
+        <div className="rounded overflow-hidden border">
+          <Table>
+            <TableHeader className="bg-secondary">
+              <TableRow>
+                <TableHead>Time</TableHead>
+                <TableHead>Activity</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {(event.agenda ?? []).map(section =>
+                section.data.map((item, i) => (
+                  <TableRow key={`${section.title}-${i}`}>
+                    <TableCell className="w-[150px]">{item.time}</TableCell>
+                    <TableCell>
+                      <p>
+                        <strong>{item.topic}</strong>
+                      </p>
+                      <p>{item.by}</p>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      </div>
       <div className="p-4 border-t">
         <h1 className="font-bold mb-4">Sponsors</h1>
 
@@ -114,7 +143,9 @@ export default async function EventDetailPage({ params }: { params: { alias: str
                 return (
                   <TableRow key={sponsor.id}>
                     <TableCell>
-                      <div className="w-8 h-8 rounded-full overflow-hidden bg-secondary" />
+                      <div className="w-16 h-16 rounded-full overflow-hidden bg-black-secondary flex items-center justify-center">
+                        <img alt={sponsor.name} title={sponsor.name} src={sponsor.logo}></img>
+                      </div>
                     </TableCell>
                     <TableCell className="font-bold">{sponsor.name}</TableCell>
                     <TableCell>{Object.keys(sponsor.tags).join(', ')}</TableCell>
