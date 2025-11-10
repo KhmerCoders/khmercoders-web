@@ -199,7 +199,7 @@ export const eventsDatabase: EventData[] = [
       {
         data: [
           {
-            time: "",
+            time: '',
             topic: 'AI and Future of Work',
             by: 'Takeshi Izuka',
           },
@@ -209,7 +209,7 @@ export const eventsDatabase: EventData[] = [
       {
         data: [
           {
-            time: "",
+            time: '',
             topic: 'AI Applications in Cambodia’s Enterprises',
             by: 'Vor Sokhna',
           },
@@ -219,7 +219,7 @@ export const eventsDatabase: EventData[] = [
       {
         data: [
           {
-            time: "",
+            time: '',
             topic: 'Coding Culture and Developer Ecosystem in Cambodia',
             by: 'In Visal',
           },
@@ -229,7 +229,7 @@ export const eventsDatabase: EventData[] = [
       {
         data: [
           {
-            time: "",
+            time: '',
             topic: 'Building Human-Centered AI',
             by: 'Buoy Rina',
           },
@@ -239,7 +239,7 @@ export const eventsDatabase: EventData[] = [
       {
         data: [
           {
-            time: "",
+            time: '',
             topic: 'Bridging AI Research and Real-World Applications',
             by: 'Sreang Rantanak',
           },

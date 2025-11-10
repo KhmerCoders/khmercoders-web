@@ -112,9 +112,11 @@ export default async function EventDetailPage({ params }: { params: { alias: str
               {(event.agenda ?? []).map(section =>
                 section.data.map((item, i) => (
                   <TableRow key={`${section.title}-${i}`}>
-                    <TableCell className='w-[150px]'>{item.time}</TableCell>
+                    <TableCell className="w-[150px]">{item.time}</TableCell>
                     <TableCell>
-                      <p><strong>{item.topic}</strong></p>
+                      <p>
+                        <strong>{item.topic}</strong>
+                      </p>
                       <p>{item.by}</p>
                     </TableCell>
                   </TableRow>
