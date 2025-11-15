@@ -37,7 +37,7 @@ export function ShowcaseHeader() {
     <>
       {editMode === 'tagline' && <DialogEditTagline onClose={handleCloseDialog} />}
       {editMode === 'website' && <DialogWebsiteLink type="website" onClose={handleCloseDialog} />}
-      {editMode === 'github' && <DialogWebsiteLink type="github" onClose={handleCloseDialog} />}`
+      {editMode === 'github' && <DialogWebsiteLink type="github" onClose={handleCloseDialog} />}
       <div className="flex gap-4 pt-2 pb-4 px-6">
         <ShowcaseLogo />
         <div className="flex flex-col justify-center">
