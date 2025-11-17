@@ -1,8 +1,7 @@
 import { eventsDatabase } from '@/data/events';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
-import { IPartner, IPartnerWithTags, partners } from '@/data/partners';
-import { PartnerCard } from '@/components/atoms/partner-card';
+import { IPartnerWithTags, partners } from '@/data/partners';
 import { Clock, Pin } from 'lucide-react';
 import { Metadata } from 'next';
 import { MainLayout } from '@/components/blocks/layout/MainLayout';
@@ -15,8 +14,6 @@ import {
   TableRow,
 } from '@/components/generated/table';
 import { StackNavigation } from '@/components/blocks/layout/StackNavigation';
-import { title } from 'process';
-import { time } from 'console';
 
 export async function generateMetadata({
   params,
