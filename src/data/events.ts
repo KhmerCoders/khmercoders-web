@@ -169,7 +169,7 @@ export const eventsDatabase: EventData[] = [
         title: 'Tentative Agenda',
         data: [
           {
-            time: '2:00 – 2:30 PM',
+            time: '2:00 - 2:30 PM',
             topic: 'Registration & Welcome Coffee',
             by: 'Sopha Sum',
           },
@@ -179,7 +179,7 @@ export const eventsDatabase: EventData[] = [
       {
         data: [
           {
-            time: '2:30 – 2:45 PM',
+            time: '2:30 - 2:45 PM',
             topic: 'Opening Remarks • Representatives from Founder of Khmer Coders Community',
             by: 'Sopha Sum',
           },
@@ -189,7 +189,7 @@ export const eventsDatabase: EventData[] = [
       {
         data: [
           {
-            time: '2:45 – 4:30 PM',
+            time: '2:45 - 4:30 PM',
             topic: 'Trends in AI Agent Development',
             by: 'Daisuke Komatsubara',
           },
@@ -249,7 +249,7 @@ export const eventsDatabase: EventData[] = [
       {
         data: [
           {
-            time: '4:30 – 5:15 PM',
+            time: '4:30 - 5:15 PM',
             topic:
               'Panel Discussion: “AI Agents & Coding for the Next Decade” Moderated by Sum Sopha',
             by: 'Sopha Sum',
@@ -260,7 +260,7 @@ export const eventsDatabase: EventData[] = [
       {
         data: [
           {
-            time: '5:15 – 5:30 PM',
+            time: '5:15 - 5:30 PM',
             topic: 'Coffee Break & Group Photo & Networking',
             by: 'Sopha Sum',
           },
@@ -270,7 +270,7 @@ export const eventsDatabase: EventData[] = [
       {
         data: [
           {
-            time: '5:30 – 7:00 PM',
+            time: '5:30 - 7:00 PM',
             topic: 'Showcase Session • Startup demos, AI agent showcases, and coding projects ',
             by: 'Sopha Sum',
           },
@@ -280,7 +280,7 @@ export const eventsDatabase: EventData[] = [
       {
         data: [
           {
-            time: '7:00 – 7:30 PM',
+            time: '7:00 - 7:30 PM',
             topic: 'Sponsors Speech and Closing Remarks',
             by: 'Sopha Sum',
           },
@@ -290,7 +290,7 @@ export const eventsDatabase: EventData[] = [
       {
         data: [
           {
-            time: '7:39 – 9:00 PM',
+            time: '7:39 - 9:00 PM',
             topic: 'Evening Party & Networking • Informal gathering with music, food, and drinks ',
             by: 'Sopha Sum',
           },
@@ -301,6 +301,14 @@ export const eventsDatabase: EventData[] = [
     sponsors: [
       { type: 'Co-organizer', id: 'datau' },
       { type: 'Co-organizer', id: 'jobify' },
+      { type: 'Venue', id: 'connexion' },
+      { type: 'Silver Sponsor', id: 'plasgate' },
+      { type: 'Silver Sponsor', id: 'techbodia' },
+      { type: 'Silver Sponsor', id: 'daun-penh-data-center' },
+      { type: 'Silver Sponsor', id: 'cambodian-network-exchange' },
+      { type: 'Silver Sponsor', id: 'sabay-tekh' },
+      { type: 'Silver Sponsor', id: 'bill24' },
+      { type: 'Silver Sponsor', id: 'khmer-enterprise' },
     ],
   },
 ];

@@ -69,7 +69,7 @@ export default async function EventDetailPage({ params }: { params: { alias: str
     .filter(Boolean) as IPartnerWithTags[];
 
   return (
-    <MainLayout>
+    <MainLayout hideRightNav>
       <StackNavigation defaultBackURL="/events" />
 
       <Image
@@ -132,7 +132,6 @@ export default async function EventDetailPage({ params }: { params: { alias: str
               <TableRow>
                 <TableHead style={{ width: 50 }}></TableHead>
                 <TableHead>Name</TableHead>
-                <TableHead>Type</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -140,12 +139,16 @@ export default async function EventDetailPage({ params }: { params: { alias: str
                 return (
                   <TableRow key={sponsor.id}>
                     <TableCell>
-                      <div className="w-16 h-16 rounded-full overflow-hidden bg-black-secondary flex items-center justify-center">
+                      <div className="w-16 h-16 rounded overflow-hidden bg-black-secondary flex items-center justify-center">
                         <img alt={sponsor.name} title={sponsor.name} src={sponsor.logo}></img>
                       </div>
                     </TableCell>
-                    <TableCell className="font-bold">{sponsor.name}</TableCell>
-                    <TableCell>{Object.keys(sponsor.tags).join(', ')}</TableCell>
+                    <TableCell>
+                      <div className="font-medium">{sponsor.name}</div>
+                      <div className="text-muted-foreground">
+                        {Object.keys(sponsor.tags).join(', ')}
+                      </div>
+                    </TableCell>
                   </TableRow>
                 );
               })}

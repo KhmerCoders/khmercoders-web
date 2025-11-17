@@ -37,7 +37,15 @@ export function ShowcaseRow({ showcase }: ShowcaseRowProps) {
         </h3>
         <p className="text-muted-foreground text-sm line-clamp-2">{showcase.tagline}</p>
         <div className="flex items-center gap-2 mt-2">
-          <div className="size-4 rounded-full bg-gray-300 dark:bg-gray-700" />
+          {showcase.user?.image ? (
+            <img
+              src={showcase.user.image}
+              alt={showcase.user.name}
+              className="size-4 rounded-full"
+            />
+          ) : (
+            <div className="size-4 rounded-full bg-gray-300 dark:bg-gray-700" />
+          )}
           <span className="text-xs text-muted-foreground">{showcase.user?.name}</span>
         </div>
       </div>
