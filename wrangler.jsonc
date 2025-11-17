@@ -46,6 +46,9 @@
     {
       "binding": "KV",
       "id": "4a1cb635d683447c8b90a31a7e2c08e0"
+    }, {
+      "binding": "NEXT_INC_CACHE_KV",
+      "id": "e10cb5ca4dbc4c71aeda4d936b7bfc69"
     }
   ],
   "analytics_engine_datasets": [
