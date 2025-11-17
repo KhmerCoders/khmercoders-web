@@ -179,7 +179,7 @@ export const updateUserProfileAction = withAuthAction(
 
       return {
         success: true,
-        message: 'Profile updated successfully.'
+        message: 'Profile updated successfully.',
       };
     } catch (error) {
       console.error('Failed to update profile:', error);
