@@ -22,7 +22,8 @@
     "db:chatbot:schema": "wrangler d1 execute kcc-chatbot --local --file=./db/chatbot/schema.sql",
     "db:chatbot:seed": "wrangler d1 execute kcc-chatbot --local --file=./db/chatbot/seed.sql",
     "generate:main-schema": "node ./scripts/generate-main-schema.js",
-    "setup": "node ./scripts/setup.js"
+    "setup": "node ./scripts/setup.js",
+    "prepare": "husky"
   },
   "dependencies": {
     "@codemirror/lang-markdown": "^6.3.3",
@@ -101,6 +102,7 @@
     "eslint-config-next": "15.3.4",
     "eslint-config-prettier": "^10.1.5",
     "eslint-plugin-prettier": "^5.5.0",
+    "husky": "^9.1.7",
     "postcss": "^8",
     "prettier": "^3.5.3",
     "tailwindcss": "^3.4.17",
