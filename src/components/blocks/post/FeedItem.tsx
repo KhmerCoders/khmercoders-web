@@ -84,8 +84,12 @@ function ArticlePreview({ data }: { data: ArticlePreviewRecord }) {
           <div className="relative w-full">
             <div className="pb-[50%]"></div>
             <img
-              src={getResizeImage(data.image, { width: 550, height: 250, quality: 100 })}
+              src={getResizeImage(data.image, { width: 550, height: 250, quality: 75 })}
               alt={data.title}
+              loading="lazy"
+              decoding="async"
+              width={550}
+              height={250}
               className="absolute inset-0 w-full h-full object-cover"
             />
           </div>
@@ -109,7 +113,15 @@ function FeedPostWrapper({
     <div className="p-4 border-b flex gap-2 w-full">
       <div className="shrink-0">
         <Link href={`/@${user?.profile?.alias}`}>
-          <img src={user?.image ?? ''} alt={user?.name} className="w-12 h-12 rounded-full" />
+          <img
+            src={user?.image ?? ''}
+            alt={user?.name}
+            loading="lazy"
+            decoding="async"
+            width={48}
+            height={48}
+            className="w-12 h-12 rounded-full"
+          />
         </Link>
       </div>
       <div className="flex flex-col grow gap-1">

@@ -4,6 +4,7 @@ import { getFeed } from '@/server/services/feed';
 import { FeedListWithLoadMore } from '@/components/blocks/post/FeedList';
 import { Metadata } from 'next';
 import { getRandomApprovedShowcase } from '@/server/services/showcase';
+import { getResizeImage } from '@/utils/image';
 import Link from 'next/link';
 
 export const revalidate = 3600; // Cache the page for 3600 seconds (1 hour)
@@ -38,7 +39,15 @@ export default async function LandingPage() {
           className="p-4 border-b flex gap-4 cursor-pointer"
         >
           <div className="relative aspect-video overflow-hidden rounded-lg shrink-0 size-16">
-            <img src={showcase.logo} alt={showcase.title} className="object-cover" />
+            <img
+              src={getResizeImage(showcase.logo, { width: 64, height: 64, quality: 75 })}
+              alt={showcase.title}
+              loading="lazy"
+              decoding="async"
+              width={64}
+              height={64}
+              className="object-cover"
+            />
           </div>
           <div className="flex grow justify-center flex-col">
             <span className="text-xs font-medium text-orange-500">Member Showcase</span>

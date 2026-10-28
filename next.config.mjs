@@ -20,6 +20,7 @@ const nextConfig = {
     webpackBuildWorker: true,
     parallelServerBuildTraces: true,
     parallelServerCompiles: true,
+    optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
   },
 };
 
