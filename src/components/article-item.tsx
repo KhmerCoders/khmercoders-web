@@ -12,7 +12,19 @@ import {
 } from './generated/dropdown-menu';
 import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import { updateArticlePublishAction } from '@/server/actions/article';
+import { useRouter } from 'next/navigation';
+import { updateArticlePublishAction, deleteArticleAction } from '@/server/actions/article';
+import { useToast } from '@/hooks/use-toast';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from './generated/alert-dialog';
 import Image from 'next/image';
 import { CommentButton, LikeButton } from './interaction-button';
 import { useSession } from './auth-provider';
@@ -26,7 +38,10 @@ interface ArticlePreviewItemProps {
 
 export function ArticlePreviewItem({ data, showControlPanel }: ArticlePreviewItemProps) {
   const [published, setPublished] = useState(data.published);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const { session } = useSession();
+  const { toast } = useToast();
+  const router = useRouter();
 
   const { mutate: togglePublished, isPending } = useMutation({
     mutationFn: async (data: { articleId: string; status: boolean }) => {
@@ -34,6 +49,35 @@ export function ArticlePreviewItem({ data, showControlPanel }: ArticlePreviewIte
     },
     onSuccess: () => {
       setPublished(!published);
+    },
+  });
+
+  const { mutate: deleteArticle, isPending: isDeleting } = useMutation({
+    mutationFn: async (articleId: string) => {
+      return await deleteArticleAction(articleId);
+    },
+    onSuccess: result => {
+      if (result?.success) {
+        toast({
+          title: 'Article deleted',
+          description: 'The article has been deleted successfully.',
+        });
+        setIsDeleteDialogOpen(false);
+        router.refresh();
+      } else {
+        toast({
+          title: 'Failed to delete article',
+          description: result?.error || 'Something went wrong. Please try again.',
+          variant: 'destructive',
+        });
+      }
+    },
+    onError: error => {
+      toast({
+        title: 'Failed to delete article',
+        description: error instanceof Error ? error.message : 'Something went wrong.',
+        variant: 'destructive',
+      });
     },
   });
 
@@ -109,8 +153,8 @@ export function ArticlePreviewItem({ data, showControlPanel }: ArticlePreviewIte
         {showControlPanel && (
           <div className="mt-4">
             <DropdownMenu modal={false}>
-              <DropdownMenuTrigger asChild disabled={isPending}>
-                <Button variant="outline" size="sm" disabled={isPending}>
+              <DropdownMenuTrigger asChild disabled={isPending || isDeleting}>
+                <Button variant="outline" size="sm" disabled={isPending || isDeleting}>
                   More Actions
                 </Button>
               </DropdownMenuTrigger>
@@ -125,9 +169,40 @@ export function ArticlePreviewItem({ data, showControlPanel }: ArticlePreviewIte
                 >
                   {published ? 'Unpublished' : 'Published'}
                 </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="text-destructive focus:text-destructive"
+                  onClick={() => setIsDeleteDialogOpen(true)}
+                >
+                  Delete Article
+                </DropdownMenuItem>
                 <DropdownMenuItem disabled>Insight (coming soon)</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+
+            <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete this article?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. The article and its related comments will be
+                    permanently deleted.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    disabled={isDeleting}
+                    onClick={event => {
+                      event.preventDefault();
+                      deleteArticle(data.id);
+                    }}
+                  >
+                    {isDeleting ? 'Deleting...' : 'Delete'}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         )}
       </div>

@@ -2,7 +2,8 @@
 import { ArticleEditorValue } from '@/app/profile/articles/components/ArticleEditor';
 import { withAuthAction } from './middleware';
 import * as schema from '@/libs/db/schema';
-import { eq } from 'drizzle-orm';
+import { and, eq, inArray } from 'drizzle-orm';
+import { revalidatePath } from 'next/cache';
 import { getMarkdownImageUrls } from '@/utils/markdown';
 import { syncUploadFilesToResource, syncUploadsToResource } from '@/server/services/upload';
 import { DrizzleD1Database } from 'drizzle-orm/d1';
@@ -121,6 +122,87 @@ export const updateArticleAction = withAuthAction(
     }
   }
 );
+
+export const deleteArticleAction = withAuthAction(async ({ db, user }, id: string) => {
+  if (!id || typeof id !== 'string' || id.trim() === '') {
+    return { success: false, error: 'Invalid article ID' };
+  }
+
+  const article = await db.query.article.findFirst({
+    where: (article, { eq }) => eq(article.id, id),
+    with: {
+      user: {
+        with: {
+          profile: true,
+        },
+      },
+    },
+  });
+
+  if (!article) {
+    return { success: false, error: 'Article not found' };
+  }
+
+  if (article.userId !== user.id) {
+    return {
+      success: false,
+      error: 'You do not have permission to delete this article',
+    };
+  }
+
+  try {
+    const commentPosts = await db.query.posts.findMany({
+      where: (post, { and, eq }) => and(eq(post.resourceType, 'article'), eq(post.resourceId, id)),
+      columns: { id: true },
+    });
+    const commentIds = commentPosts.map(post => post.id);
+
+    const operations = [
+      db
+        .delete(schema.likes)
+        .where(and(eq(schema.likes.type, 'article'), eq(schema.likes.resourceId, id))),
+    ];
+
+    if (commentIds.length > 0) {
+      operations.push(
+        db
+          .delete(schema.likes)
+          .where(and(eq(schema.likes.type, 'post'), inArray(schema.likes.resourceId, commentIds)))
+      );
+    }
+
+    operations.push(
+      db
+        .delete(schema.posts)
+        .where(and(eq(schema.posts.resourceType, 'article'), eq(schema.posts.resourceId, id))),
+      db.delete(schema.articleReviewLog).where(eq(schema.articleReviewLog.articleId, id)),
+      db
+        .delete(schema.userUploadBinding)
+        .where(
+          and(
+            eq(schema.userUploadBinding.resourceType, 'article'),
+            eq(schema.userUploadBinding.resourceId, id)
+          )
+        ),
+      db.delete(schema.article).where(eq(schema.article.id, id))
+    );
+
+    await db.batch(operations as any);
+
+    const alias = article.user?.profile?.alias;
+    if (alias) {
+      revalidatePath(`/@${alias}/articles`);
+      revalidatePath(`/@${alias}`);
+    }
+
+    return { success: true };
+  } catch (e) {
+    if (e instanceof Error) {
+      return { success: false, error: e.message };
+    }
+    return { success: false, error: 'Failed to delete article' };
+  }
+});
 
 export const updateArticlePublishAction = withAuthAction(
   async ({ db, user }, id: string, publish: boolean) => {
